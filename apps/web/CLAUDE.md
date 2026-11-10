@@ -14,8 +14,8 @@ Next.js 16 (App Router) + React 19 + Tailwind CSS 4.
 
 ## Structure
 
-- `src/app/` — Next routes, `layout.tsx`, `globals.css`, `providers/` (thin; route files only re-export from `src/views`). Routes: `/` (home), `/sign-in`, `/ui-kit` (public UI-kit demo)
-- `src/proxy.ts` — Next 16 proxy (formerly middleware): optimistic auth redirects based on the `access-token` cookie (no cookie → `/sign-in`; cookie on `/sign-in` → `/`; `/ui-kit` is public)
+- `src/app/` — Next routes, `layout.tsx`, `globals.css`, `providers/` (thin; route files only re-export from `src/views`). Routes: `/sign-in`, `/ui-kit` (public UI-kit demo), and the authenticated app shell in the `(main)` route group (`(main)/layout.tsx` renders `widgets/sidebar` next to `<main>`): `/` (dashboard), `/patients`, `/facilities`, `/providers`, `/devices`, `/settings`. Everything except the dashboard and facilities is a placeholder (`UiPagePlaceholder`). `/sign-in` and `/ui-kit` sit outside `(main)`, so they have no sidebar
+- `src/proxy.ts` — Next 16 proxy (formerly middleware): optimistic auth redirects based on the `access-token` cookie (no cookie → `/sign-in`; cookie on `/sign-in` → `/`; `/ui-kit` is public). Every other path, including the `(main)` routes, is protected
 - `src/` — also FSD layers: `views` (FSD pages layer), `widgets`, `features`, `entities`, `shared`. Alias `@/*` → `src/*`
 - `public/` — static assets
 - `next.config.ts` (also rewrites `/api/:path*` → `${API_URL}/:path*`), `eslint.config.mjs`, `tsconfig.json`
@@ -24,12 +24,18 @@ Next.js 16 (App Router) + React 19 + Tailwind CSS 4.
 
 - `src/shared/api/` is the only place that talks to the backend. `generated.ts` is produced by orval (`orval.config.js`, default axios client, plain functions only, no React Query) from `schema.yaml`; never edit it by hand. Every request goes through `createInstance` in `api-instance.ts` (`baseURL: '/api'`).
 - Import request functions, DTO types, `ErrorType` and `queryClient` from `@/shared/api` (its `index.ts` lists the public exports; add to it when another generated function is needed).
-- React Query hooks are not generated; they are written by hand in `entities/*/api` on top of those functions. `entities/session` owns `sessionQueryKey`, `useSessionQuery`, `useSignInMutation` and `useSignOutMutation`; features add navigation and cache handling in their `onSuccess`.
+- Temporary exception: `shared/api/facilities.ts` hand-writes `getFacilities` (returns `Facility[]`, accepts `q` and `sortBy`), `FacilitySortBy` and the `Facility` type (`unit: string | null`), because the API's OpenAPI schema describes `GET /facilities` as a single `FacilityDto`, omits `sortBy` and types `unit` as an object. Once the API schema is fixed, regenerate and replace it with `facilitiesControllerGetFacilities` / `FacilityDto`.
+- React Query hooks are not generated; they are written by hand in `entities/*/api` on top of those functions. `entities/session` owns `sessionQueryKey`, `useSessionQuery`, `useSignInMutation` and `useSignOutMutation`; features add navigation and cache handling in their `onSuccess`. `entities/statistics` owns `useStatisticsQuery` (`GET /statistics`). `entities/user` owns `useUserQuery` (`GET /user`), the `UserCard` (initials circle, display name, role label from `UserDto.role`; no photo yet because `avatar` uploading doesn't exist) and the `getDisplayName`/`getInitials`/`getRoleLabel` helpers.
 - `API_URL` (backend origin, default `http://localhost:3003`) is read by `next.config.ts`. Next loads `.env` files from `apps/web/`, not the repo root.
 - Forms use `react-hook-form` (`register` + per-field `validate` functions in the slice's `model/`); API errors come from the entity's React Query mutation.
 - Sign-in flow: `features/auth/sign-in` (`SignInForm`, `useSignIn`) calls `useSignInMutation` from `entities/session`; the API sets the httpOnly cookie, the feature invalidates the session query and goes to `/`. `features/auth/sign-out` (`SignOutButton`) clears the React Query cache and goes to `/sign-in`.
 - `views/sign-in` composes the Figma sign-in screen. "Forgot Password", "Terms of Use", "Privacy Policy" and "Contact Sales" are placeholder `href="#"` links (`UiLink`). There is no sign-up UI.
-- Route paths and the cookie name live in `@/shared/config` (`ROUTES`, `AUTH_COOKIE_NAME`).
+- `widgets/sidebar` (`Sidebar`, server; `SidebarNav`, client, marks the active route with `aria-current="page"`) is the dark left nav: `UiLogo`, nav items from `config/nav-items.ts`, `UserCard` and `SignOutButton appearance="link"`. `features/auth/sign-out` also has a plain text-link appearance for it.
+- `entities/facility` owns `facilitiesQueryKey`, `useFacilitiesQuery(params)` (`GET /facilities`, keeps previous data while search/sort change), `useDeleteFacilityMutation`, `formatLocation`, `FACILITY_ROW_GRID` (column layout shared by rows and the list header), `FacilityRow` (collapsible row; `expanded`/`onToggle`/`details` props) and `FacilityDetails` (read-only info grid with an `actions` slot). `features/facility/delete` (`DeleteFacilityButton`, `useDeleteFacility`) asks "Delete <name>?" in a `UiModal` (`shared/ui/ui-modal.tsx`, native `<dialog>`; `confirm` variant = Cancel + Yes, `single` variant = one Close button, from the Figma modal nodes 117-13325 / 117-12194), deletes on Yes, then invalidates the facilities and statistics queries.
+- `views/facilities` (`FacilitiesList`, client) composes the Figma list: count title, debounced name search (`UiSearch`), "Sort by" `UiDropdown` (`config/sort-options.ts`), one expanded row at a time, skeleton/error/empty states. The "+" (`UiAddButton`) and Edit buttons have no handler yet; the create/edit modal is a future feature.
+- `shared/lib` holds generic helpers: `formatDate` ("August 2, 2021") and `useDebouncedValue`.
+- `views/dashboard` shows the four statistics cards (`StatisticsCards` → `UiStatCard`, order and icons in `config/stat-cards.ts`) with skeleton and error states. The Figma search input on this screen is intentionally not built.
+- Route paths and the cookie name live in `@/shared/config` (`ROUTES`: `dashboard`, `patients`, `facilities`, `providers`, `devices`, `settings`, `signIn`, `uiKit`; `AUTH_COOKIE_NAME`).
 
 ## Conventions
 
