@@ -20,7 +20,7 @@ export function useSignIn() {
   return useSignInMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
-      router.replace(ROUTES.home);
+      router.replace(ROUTES.dashboard);
     },
   });
 }

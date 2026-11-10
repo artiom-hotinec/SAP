@@ -24,7 +24,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (hasToken && isAuthPage) {
-    return NextResponse.redirect(new URL(ROUTES.home, request.url));
+    return NextResponse.redirect(new URL(ROUTES.dashboard, request.url));
   }
 
   return NextResponse.next();

@@ -1,5 +1,10 @@
 export const ROUTES = {
-  home: '/',
+  dashboard: '/',
+  patients: '/patients',
+  facilities: '/facilities',
+  providers: '/providers',
+  devices: '/devices',
+  settings: '/settings',
   signIn: '/sign-in',
   uiKit: '/ui-kit',
 } as const;
