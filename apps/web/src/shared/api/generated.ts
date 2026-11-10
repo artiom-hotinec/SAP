@@ -18,11 +18,103 @@ export interface SignInBodyDto {
 }
 
 export interface GetSessionInfoDto {
-  id: number;
+  id: string;
   email: string;
   iat: number;
   exp: number;
 }
+
+export type UserDtoUnitsPreference = typeof UserDtoUnitsPreference[keyof typeof UserDtoUnitsPreference];
+
+
+export const UserDtoUnitsPreference = {
+  IMPERIAL: 'IMPERIAL',
+  METRIC: 'METRIC',
+} as const;
+
+export type UserDtoRole = typeof UserDtoRole[keyof typeof UserDtoRole];
+
+
+export const UserDtoRole = {
+  PATIENT: 'PATIENT',
+  PORTAL_ADMIN: 'PORTAL_ADMIN',
+  PROVIDER: 'PROVIDER',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export interface UserDto {
+  id: string;
+  email: string;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  /** @nullable */
+  avatar: string | null;
+  /** @nullable */
+  phone: string | null;
+  unitsPreference: UserDtoUnitsPreference;
+  role: UserDtoRole;
+}
+
+export interface StatisticsDto {
+  patients: number;
+  facilities: number;
+  providers: number;
+  devices: number;
+}
+
+export type FacilityDtoUnit = { [key: string]: unknown };
+
+export interface FacilityDto {
+  id: string;
+  ein: string;
+  permit: string;
+  npi: string;
+  name: string;
+  city: string;
+  state: string;
+  phone: string;
+  address: string;
+  unit?: FacilityDtoUnit;
+  zip: string;
+  contactName: string;
+  contactEmail: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface AddFacilityItemDto {
+  ein: string;
+  permit: string;
+  npi: string;
+  name: string;
+  city: string;
+  state: string;
+  phone: string;
+  address: string;
+  unit?: string;
+  zip: string;
+  contactName: string;
+  contactEmail: string;
+}
+
+export interface UpdateFacilityItemDto {
+  name: string;
+  city: string;
+  state: string;
+  phone: string;
+  address: string;
+  unit?: string;
+  zip: string;
+  contactName: string;
+  contactEmail: string;
+}
+
+export type FacilitiesControllerGetFacilitiesParams = {
+  q?: string;
+};
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -76,8 +168,74 @@ export const authControllerGetSessionInfo = (
       options);
     }
 
+export const userControllerGetUser = (
+
+ options?: SecondParameter<typeof createInstance<UserDto>>,) => {
+      return createInstance<UserDto>(
+      {url: `/user`, method: 'GET'
+    },
+      options);
+    }
+
+export const statisticsControllerGetStatistics = (
+
+ options?: SecondParameter<typeof createInstance<StatisticsDto>>,) => {
+      return createInstance<StatisticsDto>(
+      {url: `/statistics`, method: 'GET'
+    },
+      options);
+    }
+
+export const facilitiesControllerGetFacilities = (
+    params?: FacilitiesControllerGetFacilitiesParams,
+ options?: SecondParameter<typeof createInstance<FacilityDto>>,) => {
+      return createInstance<FacilityDto>(
+      {url: `/facilities`, method: 'GET',
+        params
+    },
+      options);
+    }
+
+export const facilitiesControllerCreateFacility = (
+    addFacilityItemDto: BodyType<AddFacilityItemDto>,
+ options?: SecondParameter<typeof createInstance<FacilityDto>>,) => {
+      return createInstance<FacilityDto>(
+      {url: `/facilities`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: addFacilityItemDto
+    },
+      options);
+    }
+
+export const facilitiesControllerUpdateFacility = (
+    id: string,
+    updateFacilityItemDto: BodyType<UpdateFacilityItemDto>,
+ options?: SecondParameter<typeof createInstance<FacilityDto>>,) => {
+      return createInstance<FacilityDto>(
+      {url: `/facilities/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateFacilityItemDto
+    },
+      options);
+    }
+
+export const facilitiesControllerDeleteFacility = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<FacilityDto>>,) => {
+      return createInstance<FacilityDto>(
+      {url: `/facilities/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+
 export type AppControllerGetHelloResult = NonNullable<Awaited<ReturnType<typeof appControllerGetHello>>>
 export type AuthControllerSignUpResult = NonNullable<Awaited<ReturnType<typeof authControllerSignUp>>>
 export type AuthControllerSignInResult = NonNullable<Awaited<ReturnType<typeof authControllerSignIn>>>
 export type AuthControllerSignOutResult = NonNullable<Awaited<ReturnType<typeof authControllerSignOut>>>
 export type AuthControllerGetSessionInfoResult = NonNullable<Awaited<ReturnType<typeof authControllerGetSessionInfo>>>
+export type UserControllerGetUserResult = NonNullable<Awaited<ReturnType<typeof userControllerGetUser>>>
+export type StatisticsControllerGetStatisticsResult = NonNullable<Awaited<ReturnType<typeof statisticsControllerGetStatistics>>>
+export type FacilitiesControllerGetFacilitiesResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerGetFacilities>>>
+export type FacilitiesControllerCreateFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerCreateFacility>>>
+export type FacilitiesControllerUpdateFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerUpdateFacility>>>
+export type FacilitiesControllerDeleteFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerDeleteFacility>>>

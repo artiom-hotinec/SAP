@@ -61,6 +61,109 @@ paths:
                 $ref: '#/components/schemas/GetSessionInfoDto'
       tags:
         - Auth
+  /user:
+    get:
+      operationId: UserController_getUser
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - User
+  /statistics:
+    get:
+      operationId: StatisticsController_getStatistics
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsDto'
+      tags:
+        - Statistics
+  /facilities:
+    get:
+      operationId: FacilitiesController_getFacilities
+      parameters:
+        - name: q
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacilityDto'
+      tags:
+        - Facilities
+    post:
+      operationId: FacilitiesController_createFacility
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFacilityItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacilityDto'
+      tags:
+        - Facilities
+  /facilities/{id}:
+    patch:
+      operationId: FacilitiesController_updateFacility
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFacilityItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacilityDto'
+      tags:
+        - Facilities
+    delete:
+      operationId: FacilitiesController_deleteFacility
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacilityDto'
+      tags:
+        - Facilities
 info:
   title: SAP
   description: API documentation
@@ -98,7 +201,7 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: string
         email:
           type: string
         iat:
@@ -110,3 +213,180 @@ components:
         - email
         - iat
         - exp
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        avatar:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        unitsPreference:
+          type: string
+          enum:
+            - IMPERIAL
+            - METRIC
+        role:
+          type: string
+          enum:
+            - PATIENT
+            - PORTAL_ADMIN
+            - PROVIDER
+            - SUPER_ADMIN
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - avatar
+        - phone
+        - unitsPreference
+        - role
+    StatisticsDto:
+      type: object
+      properties:
+        patients:
+          type: number
+        facilities:
+          type: number
+        providers:
+          type: number
+        devices:
+          type: number
+      required:
+        - patients
+        - facilities
+        - providers
+        - devices
+    FacilityDto:
+      type: object
+      properties:
+        id:
+          type: string
+        ein:
+          type: string
+        permit:
+          type: string
+        npi:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        unit:
+          type: object
+        zip:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - ein
+        - permit
+        - npi
+        - name
+        - city
+        - state
+        - phone
+        - address
+        - zip
+        - contactName
+        - contactEmail
+        - active
+        - createdAt
+    AddFacilityItemDto:
+      type: object
+      properties:
+        ein:
+          type: string
+        permit:
+          type: string
+        npi:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        unit:
+          type: string
+        zip:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+      required:
+        - ein
+        - permit
+        - npi
+        - name
+        - city
+        - state
+        - phone
+        - address
+        - zip
+        - contactName
+        - contactEmail
+    UpdateFacilityItemDto:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        unit:
+          type: string
+        zip:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+      required:
+        - name
+        - city
+        - state
+        - phone
+        - address
+        - zip
+        - contactName
+        - contactEmail
