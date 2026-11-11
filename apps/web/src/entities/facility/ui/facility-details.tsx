@@ -9,7 +9,7 @@ export interface FacilityDetailsProps extends HTMLAttributes<HTMLElement> {
   actions?: ReactNode;
 }
 
-const FIELD = 'w-37.5';
+const FIELD = 'w-full max-w-37.5';
 
 export function FacilityDetails({
   facility,
@@ -32,7 +32,7 @@ export function FacilityDetails({
         {actions && <div className="flex items-center gap-6">{actions}</div>}
       </div>
 
-      <div className="mt-10 grid grid-cols-[repeat(4,150px)] gap-x-25.5 gap-y-5.75">
+      <div className="mt-10 grid grid-cols-2 gap-x-8 lg:grid-cols-[repeat(4,150px)] lg:gap-x-25.5 gap-y-5.75">
         <UiReadonlyField
           className={FIELD}
           label="Facility Name"

@@ -3,4 +3,4 @@
  * (Figma: name / city, state / phone / date added / chevron).
  */
 export const FACILITY_ROW_GRID =
-  'grid grid-cols-[266px_258px_226px_1fr_24px] items-center pr-4 pl-10.25';
+  'grid grid-cols-[minmax(0,266fr)_minmax(0,258fr)_minmax(0,226fr)_minmax(0,180fr)_24px] items-center pr-4 pl-10.25';

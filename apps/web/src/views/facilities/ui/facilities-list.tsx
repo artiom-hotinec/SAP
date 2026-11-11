@@ -38,12 +38,12 @@ export function FacilitiesList() {
       : `${count} ${count === 1 ? 'Facility' : 'Facilities'}`;
 
   return (
-    <div className="w-full max-w-243">
-      <div className="-mt-1.5 flex items-center justify-between gap-6">
+    <div className="w-full">
+      <div className="-mt-1.5 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
         <UiPageTitle className="text-grey-800">{title}</UiPageTitle>
-        <div className="flex items-center gap-6">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-6">
           <UiSearch
-            className="w-90.25"
+            className="w-full min-w-0 sm:w-90.25"
             placeholder="Search for facility"
             aria-label="Search for facility"
             value={search}
@@ -54,7 +54,7 @@ export function FacilitiesList() {
         </div>
       </div>
 
-      <div className="mt-6.75 ml-auto w-62.75">
+      <div className="mt-6.75 ml-auto w-full max-w-62.75">
         <UiDropdown
           size="sm"
           aria-label="Sort by"
@@ -73,7 +73,9 @@ export function FacilitiesList() {
         )}
       >
         {COLUMNS.map((column) => (
-          <span key={column}>{column}</span>
+          <span key={column} className="truncate pr-4">
+            {column}
+          </span>
         ))}
       </div>
 
