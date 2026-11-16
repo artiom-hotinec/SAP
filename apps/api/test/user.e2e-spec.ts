@@ -5,6 +5,7 @@ import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from './../src/app.module.js';
 import { DbService } from './../src/db/db.service.js';
+import type { UserDto } from './../src/user/dto.js';
 
 /**
  * E2E contract for the current user endpoints (AuthGuard on the whole controller).
@@ -49,9 +50,7 @@ describe('User (e2e)', () => {
       .post('/auth/login')
       .send({ email, password })
       .expect(200);
-    const cookies = ([] as string[]).concat(
-      (res.headers['set-cookie'] as string[] | string | undefined) ?? [],
-    );
+    const cookies = ([] as string[]).concat(res.headers['set-cookie'] ?? []);
     const cookie = cookies.find((c) => c.startsWith('access-token='));
     return cookie!.split(';')[0];
   }
@@ -106,9 +105,10 @@ describe('User (e2e)', () => {
         avatar: null,
         phone: null,
       });
-      expect(typeof res.body.id).toBe('string');
-      expect(res.body.unitsPreference).toBeDefined();
-      expect(res.body.role).toBeDefined();
+      const body = res.body as UserDto;
+      expect(typeof body.id).toBe('string');
+      expect(body.unitsPreference).toBeDefined();
+      expect(body.role).toBeDefined();
     });
 
     it('returns the user of the token, not another one', async () => {
@@ -124,9 +124,11 @@ describe('User (e2e)', () => {
         .set('Cookie', second.cookie)
         .expect(200);
 
-      expect(res1.body.email).toBe(first.email);
-      expect(res2.body.email).toBe(second.email);
-      expect(res1.body.id).not.toBe(res2.body.id);
+      const body1 = res1.body as UserDto;
+      const body2 = res2.body as UserDto;
+      expect(body1.email).toBe(first.email);
+      expect(body2.email).toBe(second.email);
+      expect(body1.id).not.toBe(body2.id);
     });
 
     it('does not leak the password, hash or salt', async () => {
@@ -138,8 +140,9 @@ describe('User (e2e)', () => {
       expect(body).not.toContain(PASSWORD.toLowerCase());
       expect(body).not.toContain('hash');
       expect(body).not.toContain('salt');
-      expect(res.body.passwordHash).toBeUndefined();
-      expect(res.body.salt).toBeUndefined();
+      const raw = res.body as Record<string, unknown>;
+      expect(raw.passwordHash).toBeUndefined();
+      expect(raw.salt).toBeUndefined();
     });
   });
 
@@ -251,7 +254,7 @@ describe('User (e2e)', () => {
         .expect(204);
 
       const res = await http().get('/user').set('Cookie', cookie).expect(200);
-      expect(res.body.email).toBe(email);
+      expect((res.body as UserDto).email).toBe(email);
     });
 
     it.each([
