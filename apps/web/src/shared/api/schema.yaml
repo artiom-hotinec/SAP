@@ -74,6 +74,20 @@ paths:
                 $ref: '#/components/schemas/UserDto'
       tags:
         - User
+    patch:
+      operationId: UserController_changePassword
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordBodyDto'
+      responses:
+        '204':
+          description: ''
+      tags:
+        - User
   /statistics:
     get:
       operationId: StatisticsController_getStatistics
@@ -301,6 +315,18 @@ components:
         - phone
         - unitsPreference
         - role
+    ChangePasswordBodyDto:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          example: '1234'
+        newPassword:
+          type: string
+          example: '4321'
+      required:
+        - oldPassword
+        - newPassword
     StatisticsDto:
       type: object
       properties:

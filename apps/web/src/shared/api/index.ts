@@ -9,10 +9,12 @@ export {
   providersControllerGetProviders,
   ProviderSortBy,
   statisticsControllerGetStatistics,
+  userControllerChangePassword,
   userControllerGetUser,
 } from './generated';
 export type {
   AddFacilityItemDto,
+  ChangePasswordBodyDto,
   GetSessionInfoDto,
   ProviderDto,
   ProvidersControllerGetProvidersParams,

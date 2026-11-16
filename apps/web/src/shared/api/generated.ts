@@ -57,6 +57,11 @@ export interface UserDto {
   role: UserDtoRole;
 }
 
+export interface ChangePasswordBodyDto {
+  oldPassword: string;
+  newPassword: string;
+}
+
 export interface StatisticsDto {
   patients: number;
   facilities: number;
@@ -206,6 +211,17 @@ export const userControllerGetUser = (
       options);
     }
 
+export const userControllerChangePassword = (
+    changePasswordBodyDto: BodyType<ChangePasswordBodyDto>,
+ options?: SecondParameter<typeof createInstance<void>>,) => {
+      return createInstance<void>(
+      {url: `/user`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: changePasswordBodyDto
+    },
+      options);
+    }
+
 export const statisticsControllerGetStatistics = (
 
  options?: SecondParameter<typeof createInstance<StatisticsDto>>,) => {
@@ -282,6 +298,7 @@ export type AuthControllerSignInResult = NonNullable<Awaited<ReturnType<typeof a
 export type AuthControllerSignOutResult = NonNullable<Awaited<ReturnType<typeof authControllerSignOut>>>
 export type AuthControllerGetSessionInfoResult = NonNullable<Awaited<ReturnType<typeof authControllerGetSessionInfo>>>
 export type UserControllerGetUserResult = NonNullable<Awaited<ReturnType<typeof userControllerGetUser>>>
+export type UserControllerChangePasswordResult = NonNullable<Awaited<ReturnType<typeof userControllerChangePassword>>>
 export type StatisticsControllerGetStatisticsResult = NonNullable<Awaited<ReturnType<typeof statisticsControllerGetStatistics>>>
 export type FacilitiesControllerGetFacilitiesResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerGetFacilities>>>
 export type FacilitiesControllerCreateFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerCreateFacility>>>
