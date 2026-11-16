@@ -13,15 +13,16 @@ npm run dev:web   # frontend on http://localhost:3000
 
 ## Routes
 
-| Route                                | Access                                                                     |
-| ------------------------------------ | -------------------------------------------------------------------------- |
-| `/` (dashboard)                      | requires the `access-token` cookie, otherwise → `/sign-in`                 |
-| `/facilities`                        | same as `/`; facilities list (search, sort, details, create, edit, delete) |
-| `/providers`                         | same as `/`; providers list (search, sort; rows link to details)           |
-| `/providers/[id]`                    | same as `/`; provider details                                              |
-| `/patients`, `/devices`, `/settings` | same as `/`; placeholder pages for now                                     |
-| `/sign-in`                           | guests only; with the cookie → `/`                                         |
-| `/ui-kit`                            | public demo of the UI kit components in `src/shared/ui`                    |
+| Route                   | Access                                                                     |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `/` (dashboard)         | requires the `access-token` cookie, otherwise → `/sign-in`                 |
+| `/facilities`           | same as `/`; facilities list (search, sort, details, create, edit, delete) |
+| `/providers`            | same as `/`; providers list (search, sort; rows link to details)           |
+| `/providers/[id]`       | same as `/`; provider details                                              |
+| `/settings`             | same as `/`; account information and change password (drawer)              |
+| `/patients`, `/devices` | same as `/`; placeholder pages for now                                     |
+| `/sign-in`              | guests only; with the cookie → `/`                                         |
+| `/ui-kit`               | public demo of the UI kit components in `src/shared/ui`                    |
 
 The authenticated routes live in the `src/app/(main)` route group and share a layout with the sidebar (`src/widgets/sidebar`). `/sign-in` and `/ui-kit` have no sidebar.
 
@@ -45,7 +46,7 @@ src/
   app/        Next routes (thin re-exports), layout, providers
   views/      FSD pages layer: dashboard, patients, facilities, providers, provider-details, devices, settings, sign-in, ui-kit
   widgets/    sidebar
-  features/   auth/sign-in, auth/sign-out, facility/delete, facility/upsert
+  features/   auth/sign-in, auth/sign-out, facility/delete, facility/upsert, user/change-password
   entities/   session, statistics, user, facility, provider
   shared/     api, config (ROUTES, cookie name, US_STATES), lib (formatDate, useDebouncedValue), ui (UI kit)
   proxy.ts    auth redirects
