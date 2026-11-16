@@ -3,3 +3,14 @@ node_modules
 .env
 
 /generated/prisma
+
+# Generated Prisma client (run `npx prisma generate`)
+/src/generated/
+
+# Copies written by `prisma skills sync`
+/.agents/
+/.cursor/
+/.devin/
+/.windsurf/
+/.claude/skills/
+/skills-lock.json

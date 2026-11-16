@@ -9,3 +9,9 @@ coverage/
 .env.*
 .DS_Store
 .claude/settings.local.json
+
+# Local tooling and build artifacts
+.playwright-mcp/
+apps/web/.next-stale-root/
+.claude/plans/
+*.tsbuildinfo
