@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 /** Returns `value` once it has stopped changing for `delay` ms. */
