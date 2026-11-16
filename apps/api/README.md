@@ -23,7 +23,12 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend of the SAP portal, built with [Nest](https://github.com/nestjs/nest), Prisma 7 and PostgreSQL. It serves auth (JWT in an httpOnly `access-token` cookie), the current user, dashboard statistics facilities (list with search/sort, create, update, delete) and providers (list with search/sort, get by id).
+
+- Interactive API docs (Swagger UI): `http://localhost:3003/api/docs`; OpenAPI YAML: `http://localhost:3003/api/docs-yaml` (the web client is generated from it)
+- Endpoints, auth, environment variables and conventions: see [`CLAUDE.md`](./CLAUDE.md)
+- Database: `prisma/schema.prisma` and `prisma/migrations/`; start a local PostgreSQL from the repo root with `docker compose up -d db`. Required env: `DATABASE_URL` (optional `PORT`, default `3003`); see the auth and environment notes in `CLAUDE.md` for `JWT_SECRET`
+- Design notes on the data model: [`docs/db-entities.md`](./docs/db-entities.md)
 
 ## Project setup
 
