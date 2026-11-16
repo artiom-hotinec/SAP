@@ -34,6 +34,15 @@ function decodeJwt(token: string) {
   return { header: parse(header), payload: parse(payload), signature };
 }
 
+// Login sets the JWT only in the `access-token` httpOnly cookie (no body).
+function tokenFromCookie(res: { headers: Record<string, unknown> }) {
+  const cookies = ([] as string[]).concat(
+    (res.headers['set-cookie'] as string[] | string | undefined) ?? [],
+  );
+  const cookie = cookies.find((c) => c.startsWith('access-token='));
+  return cookie?.split(';')[0].slice('access-token='.length);
+}
+
 function expectValidJwt(token: unknown) {
   expect(typeof token).toBe('string');
   const parts = (token as string).split('.');
@@ -41,7 +50,7 @@ function expectValidJwt(token: unknown) {
   parts.forEach((part) => expect(part).toMatch(/^[A-Za-z0-9_-]+$/));
 
   const { payload } = decodeJwt(token as string);
-  expect(payload.sub).toBeDefined();
+  expect(payload.id).toBeDefined();
   expect(payload.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
   expect(JSON.stringify(payload).toLowerCase()).not.toContain('password');
   return payload;
@@ -100,7 +109,7 @@ describe('Auth (e2e)', () => {
         .send({ email, password: PASSWORD })
         .expect(200);
 
-      expectValidJwt(res.body.accessToken);
+      expectValidJwt(tokenFromCookie(res));
     });
 
     it('rejects an already registered email with 409', async () => {
@@ -128,8 +137,8 @@ describe('Auth (e2e)', () => {
         .send({ email: email.toUpperCase(), password: PASSWORD })
         .expect(201);
 
-      expect(decodeJwt(second.body.accessToken).payload.sub).not.toBe(
-        decodeJwt(first.body.accessToken).payload.sub,
+      expect(decodeJwt(second.body.accessToken).payload.id).not.toBe(
+        decodeJwt(first.body.accessToken).payload.id,
       );
     });
 
@@ -205,7 +214,7 @@ describe('Auth (e2e)', () => {
         .send({ email, password: PASSWORD })
         .expect(200);
 
-      expectValidJwt(res.body.accessToken);
+      expectValidJwt(tokenFromCookie(res));
     });
 
     it('does not leak the password or hash in the response', async () => {
@@ -230,8 +239,8 @@ describe('Auth (e2e)', () => {
         .send({ email: newEmail, password: PASSWORD })
         .expect(200);
 
-      expect(decodeJwt(loggedIn.body.accessToken).payload.sub).toBe(
-        decodeJwt(registered.body.accessToken).payload.sub,
+      expect(decodeJwt(tokenFromCookie(loggedIn) as string).payload.id).toBe(
+        decodeJwt(registered.body.accessToken).payload.id,
       );
     });
 
