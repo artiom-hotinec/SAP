@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import Image from 'next/image';
 import { useId, useState } from 'react';
 import type { InputHTMLAttributes } from 'react';
 
@@ -17,6 +18,10 @@ export interface UiInputProps extends Omit<
   label?: string;
   /** Error message shown under the input; also marks the input as invalid. */
   error?: string;
+  /** Helper text under the input; replaced by `error` when both are set. */
+  hint?: string;
+  /** Shows a check icon after the hint (the hint's condition is satisfied). */
+  hintValid?: boolean;
   /** Class names for the outer wrapper (the native input gets the rest of the props). */
   className?: string;
 }
@@ -79,6 +84,8 @@ export function UiInput({
   size = 'md',
   label,
   error,
+  hint,
+  hintValid,
   className,
   id,
   placeholder = ' ',
@@ -91,6 +98,7 @@ export function UiInput({
 
   const isPassword = type === 'password';
   const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
   const hasError =
     Boolean(error) || ariaInvalid === true || ariaInvalid === 'true';
 
@@ -110,7 +118,9 @@ export function UiInput({
           type={isPassword && passwordVisible ? 'text' : type}
           placeholder={placeholder}
           aria-invalid={hasError || ariaInvalid}
-          aria-describedby={error ? errorId : props['aria-describedby']}
+          aria-describedby={
+            error ? errorId : hint ? hintId : props['aria-describedby']
+          }
           className={clsx(
             inputBaseClasses,
             sizeClasses[size].input,
@@ -140,6 +150,23 @@ export function UiInput({
       {error && (
         <p id={errorId} className="mt-1 text-body-sm text-red-400">
           {error}
+        </p>
+      )}
+      {!error && hint && (
+        <p
+          id={hintId}
+          className="mt-1.5 flex items-center gap-2 px-1.5 text-body-sm font-light text-grey-600"
+        >
+          {hint}
+          {hintValid && (
+            <Image
+              src="/icons/check-outline.svg"
+              alt="Satisfied"
+              width={24}
+              height={24}
+              className="shrink-0"
+            />
+          )}
         </p>
       )}
     </div>
