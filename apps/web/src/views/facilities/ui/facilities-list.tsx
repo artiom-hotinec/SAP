@@ -9,11 +9,13 @@ import {
   useFacilitiesQuery,
 } from '@/entities/facility';
 import { DeleteFacilityButton } from '@/features/facility/delete';
+import {
+  CreateFacilityButton,
+  EditFacilityButton,
+} from '@/features/facility/upsert';
 import type { FacilitySortBy } from '@/shared/api';
 import { useDebouncedValue } from '@/shared/lib';
-import { UiAddButton } from '@/shared/ui/ui-add-button';
 import { UiDropdown } from '@/shared/ui/ui-dropdown';
-import { UiIconButton } from '@/shared/ui/ui-icon-button';
 import { UiPageTitle } from '@/shared/ui/ui-page-title';
 import { UiSearch } from '@/shared/ui/ui-search';
 import { isSortBy, SORT_OPTIONS } from '../config/sort-options';
@@ -49,8 +51,7 @@ export function FacilitiesList() {
             value={search}
             onValueChange={setSearch}
           />
-          {/* TODO: open the create-facility modal (upcoming feature). */}
-          <UiAddButton aria-label="Add facility" />
+          <CreateFacilityButton />
         </div>
       </div>
 
@@ -113,11 +114,7 @@ export function FacilitiesList() {
                         facility={facility}
                         actions={
                           <>
-                            {/* TODO: open the edit-facility modal (upcoming feature). */}
-                            <UiIconButton
-                              icon="/icons/edit.svg"
-                              aria-label={`Edit ${facility.name}`}
-                            />
+                            <EditFacilityButton facility={facility} />
                             <DeleteFacilityButton facility={facility} />
                           </>
                         }
