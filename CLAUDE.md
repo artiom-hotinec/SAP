@@ -25,6 +25,7 @@ npm-workspaces monorepo (`apps/*`). Run commands from the repo root unless noted
 - Frontend (`apps/web`) follows Feature-Sliced Design; see `apps/web/CLAUDE.md`.
 - Each app has an `AGENTS.md` with framework-specific rules; read it before working there.
 - `DRAFT.md` holds project notes/drafts.
+- **Browser testing (Playwright MCP):** when checking UI changes in the browser, sign in with the existing test user `test@gmail.com` / `1234`. Don't create extra users (no new rows in the dev DB). Only if that user doesn't exist, register it with exactly that email and password (`POST /auth/register`).
 
 ## Documentation
 
