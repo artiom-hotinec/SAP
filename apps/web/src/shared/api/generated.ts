@@ -112,8 +112,37 @@ export interface UpdateFacilityItemDto {
   contactEmail: string;
 }
 
+export type ProviderSortBy = typeof ProviderSortBy[keyof typeof ProviderSortBy];
+
+
+export const ProviderSortBy = {
+  providerName: 'providerName',
+  facilityName: 'facilityName',
+} as const;
+
+export interface ProviderDto {
+  id: string;
+  providerName: string;
+  email: string;
+  npi: string;
+  phone: string;
+  address: string;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  facilityName: string;
+  dateHired: string;
+}
+
 export type FacilitiesControllerGetFacilitiesParams = {
   q?: string;
+  sortBy?: string;
+};
+
+export type ProvidersControllerGetProvidersParams = {
+  q?: string;
+  sortBy?: ProviderSortBy;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -228,6 +257,25 @@ export const facilitiesControllerDeleteFacility = (
       options);
     }
 
+export const providersControllerGetProviders = (
+    params?: ProvidersControllerGetProvidersParams,
+ options?: SecondParameter<typeof createInstance<ProviderDto[]>>,) => {
+      return createInstance<ProviderDto[]>(
+      {url: `/providers`, method: 'GET',
+        params
+    },
+      options);
+    }
+
+export const providersControllerGetProvider = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<ProviderDto>>,) => {
+      return createInstance<ProviderDto>(
+      {url: `/providers/${id}`, method: 'GET'
+    },
+      options);
+    }
+
 export type AppControllerGetHelloResult = NonNullable<Awaited<ReturnType<typeof appControllerGetHello>>>
 export type AuthControllerSignUpResult = NonNullable<Awaited<ReturnType<typeof authControllerSignUp>>>
 export type AuthControllerSignInResult = NonNullable<Awaited<ReturnType<typeof authControllerSignIn>>>
@@ -239,3 +287,5 @@ export type FacilitiesControllerGetFacilitiesResult = NonNullable<Awaited<Return
 export type FacilitiesControllerCreateFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerCreateFacility>>>
 export type FacilitiesControllerUpdateFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerUpdateFacility>>>
 export type FacilitiesControllerDeleteFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerDeleteFacility>>>
+export type ProvidersControllerGetProvidersResult = NonNullable<Awaited<ReturnType<typeof providersControllerGetProviders>>>
+export type ProvidersControllerGetProviderResult = NonNullable<Awaited<ReturnType<typeof providersControllerGetProvider>>>

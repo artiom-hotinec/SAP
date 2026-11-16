@@ -2,14 +2,23 @@ export {
   authControllerGetSessionInfo,
   authControllerSignIn,
   authControllerSignOut,
+  facilitiesControllerCreateFacility,
   facilitiesControllerDeleteFacility,
+  facilitiesControllerUpdateFacility,
+  providersControllerGetProvider,
+  providersControllerGetProviders,
+  ProviderSortBy,
   statisticsControllerGetStatistics,
   userControllerGetUser,
 } from './generated';
 export type {
+  AddFacilityItemDto,
   GetSessionInfoDto,
+  ProviderDto,
+  ProvidersControllerGetProvidersParams,
   SignInBodyDto,
   StatisticsDto,
+  UpdateFacilityItemDto,
   UserDto,
   UserDtoRole,
 } from './generated';

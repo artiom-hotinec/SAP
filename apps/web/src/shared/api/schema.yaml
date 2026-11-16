@@ -96,6 +96,11 @@ paths:
           in: query
           schema:
             type: string
+        - name: sortBy
+          required: false
+          in: query
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -164,6 +169,49 @@ paths:
                 $ref: '#/components/schemas/FacilityDto'
       tags:
         - Facilities
+  /providers:
+    get:
+      operationId: ProvidersController_getProviders
+      parameters:
+        - name: q
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          required: false
+          in: query
+          schema:
+            $ref: '#/components/schemas/ProviderSortBy'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderDto'
+      tags:
+        - Providers
+  /providers/{id}:
+    get:
+      operationId: ProvidersController_getProvider
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderDto'
+      tags:
+        - Providers
 info:
   title: SAP
   description: API documentation
@@ -390,3 +438,45 @@ components:
         - zip
         - contactName
         - contactEmail
+    ProviderSortBy:
+      type: string
+      enum:
+        - providerName
+        - facilityName
+    ProviderDto:
+      type: object
+      properties:
+        id:
+          type: string
+        providerName:
+          type: string
+        email:
+          type: string
+        npi:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        facilityName:
+          type: string
+        dateHired:
+          format: date-time
+          type: string
+      required:
+        - id
+        - providerName
+        - email
+        - npi
+        - phone
+        - address
+        - firstName
+        - lastName
+        - facilityName
+        - dateHired
