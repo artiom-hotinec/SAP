@@ -1,0 +1,328 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PATIENT
+  PROVIDER
+  PORTAL_ADMIN
+  SUPER_ADMIN
+}
+
+enum UnitsPreference {
+  METRIC
+  IMPERIAL
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+}
+
+enum MessageDirection {
+  PROVIDER_TO_PATIENT
+  PATIENT_TO_PROVIDER
+}
+
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RampMode {
+  AUTO
+  MANUAL
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// Org and users
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  passwordHash String
+  salt         String
+
+  role            UserRole        @default(PATIENT)
+  unitsPreference UnitsPreference @default(METRIC)
+
+  firstName  String?
+  lastName   String?
+  avatar     String?
+  resetToken String? @unique
+  phone      String?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  resetTokenExpiresAt DateTime?
+
+  provider Provider?
+  patient  Patient?
+
+  authoredNotes PatientNote[]
+}
+
+model Facility {
+  id      String  @id @default(uuid())
+
+  ein     String  @unique
+  permit  String
+  npi     String
+
+  name    String
+  city    String
+  state   String
+  phone   String
+  address String
+  unit    String?
+  zip     String
+  contactName String
+  contactEmail String
+  active  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  providers Provider[]
+  patients  Patient[]
+  devices   Device[]
+}
+
+model Provider {
+  id        String   @id @default(uuid())
+  npi       String   @unique
+  phone     String
+  address   String
+  dateHired DateTime
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patients Patient[]
+  messages ProviderMessage[]
+
+  @@index([facilityId])
+}
+
+model Patient {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String    @unique
+  phone     String
+  dob       DateTime?
+  sex       Sex?
+  heightIn  Float?
+  weightLb  Float?
+  address   String?
+  city      String?
+  state     String?
+  unit      String?
+  zip       String?
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Restrict)
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clinicalInfo PatientClinicalInfo?
+  notes        PatientNote[]
+  documents    PatientDocument[]
+  messages     ProviderMessage[]
+  devices      Device[]
+  sessions     TherapySession[]
+
+  @@index([providerId])
+  @@index([facilityId])
+}
+
+// Clinical
+
+model PatientClinicalInfo {
+  id String @id @default(uuid())
+
+  // Provider enters a pressure range (cmH2O); entering it activates the device.
+  prescribedPressureMin Float?
+  prescribedPressureMax Float?
+  approvalStatus        ApprovalStatus @default(PENDING)
+
+  sleepStudy      Boolean   @default(false)
+  sleepStudyDate  DateTime?
+  atHomeStudy     Boolean   @default(false)
+  maskFitting     Boolean   @default(false)
+  maskFittingDate DateTime?
+  lastAppointment DateTime?
+
+  patientId String  @unique
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientNote {
+  id   String @id @default(uuid())
+  body String
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([authorId])
+}
+
+model PatientDocument {
+  id      String @id @default(uuid())
+  name    String
+  fileUrl String
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  uploadedAt DateTime @default(now())
+
+  @@index([patientId])
+}
+
+model ProviderMessage {
+  id        String           @id @default(uuid())
+  body      String
+  direction MessageDirection
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([patientId, createdAt])
+  @@index([providerId])
+}
+
+// Devices
+
+model DeviceModel {
+  id   String @id @default(uuid())
+  name String @unique // KAM, KAM 2, ...
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  devices Device[]
+}
+
+model Device {
+  id String @id @default(uuid())
+
+  // Portals show the long GS1-style ID, the app shows the short 8-char ID.
+  deviceId        String       @unique
+  shortId         String       @unique
+  displayName     String? // e.g. "Kälm CPAP 2.0"
+  manufactureDate DateTime
+  status          DeviceStatus @default(INACTIVE)
+  pairedAt        DateTime?
+  lastConnectedAt DateTime?
+
+  deviceModelId String
+  deviceModel   DeviceModel @relation(fields: [deviceModelId], references: [id], onDelete: Restrict)
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Restrict)
+
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  settings DeviceSettings?
+  sessions TherapySession[]
+
+  @@index([deviceModelId])
+  @@index([facilityId])
+  @@index([patientId])
+}
+
+model DeviceSettings {
+  id String @id @default(uuid())
+
+  ramp            RampMode @default(AUTO)
+  smartAlarm      Boolean  @default(false)
+  smartAlarmTime  String? // "HH:mm", e.g. "07:30"
+  bedtime         String? // "HH:mm", e.g. "23:00"
+  pressure        Float? // cmH2O
+  humidityPercent Int? // e.g. 80
+
+  deviceId String @unique
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Therapy data
+
+model TherapySession {
+  id String @id @default(uuid())
+
+  startedAt DateTime
+  endedAt   DateTime
+
+  usageHours     Float
+  leakLpm        Float?
+  eventsPerHour  Float?
+  movementCount  Int?
+  snoringMinutes Int? // minutes, per the doc's design note
+  bloodOxygenPct Float?
+  heartRateBpm   Int?
+
+  // Normally computed from usage, leaks, events and movement.
+  // Stored only as an optional snapshot for history (0-100).
+  kalmScore Int?
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@unique([deviceId, startedAt])
+  @@index([patientId, startedAt])
+}

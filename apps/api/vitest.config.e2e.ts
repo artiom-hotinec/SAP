@@ -6,5 +6,7 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.e2e-spec.ts'],
+    // Specs share one DB and some assert on global row counts.
+    fileParallelism: false,
   },
 });
