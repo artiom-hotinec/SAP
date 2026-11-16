@@ -1,5 +1,5 @@
-import { UiPagePlaceholder } from '@/shared/ui/ui-page-placeholder';
+import { ProvidersList } from './providers-list';
 
 export function ProvidersPage() {
-  return <UiPagePlaceholder title="Providers" />;
+  return <ProvidersList />;
 }

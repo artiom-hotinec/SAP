@@ -9,4 +9,8 @@ export const ROUTES = {
   uiKit: '/ui-kit',
 } as const;
 
+/** Path of a single provider's details page. */
+export const providerDetailsRoute = (id: string) =>
+  `${ROUTES.providers}/${encodeURIComponent(id)}`;
+
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
