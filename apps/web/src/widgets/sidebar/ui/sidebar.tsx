@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import { UserCard } from '@/entities/user';
 import { SignOutButton } from '@/features/auth/sign-out';
 import { UiLogo } from '@/shared/ui/ui-logo';
 import { SidebarNav } from './sidebar-nav';
+import { SidebarNavList } from './sidebar-nav-list';
 
 export function Sidebar() {
   return (
@@ -11,7 +13,10 @@ export function Sidebar() {
         <p className="mt-1.75 text-h5 text-white-high">Master Portal</p>
       </div>
       <div className="mt-5">
-        <SidebarNav />
+        {/* usePathname suspends on routes with runtime params (/providers/[id]) */}
+        <Suspense fallback={<SidebarNavList pathname="" />}>
+          <SidebarNav />
+        </Suspense>
       </div>
       <div className="mt-auto flex flex-col items-end gap-4 px-5 pb-5.5">
         <UserCard className="w-full" />
