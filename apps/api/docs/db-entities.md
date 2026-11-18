@@ -66,6 +66,7 @@ The product has a patient mobile app and web portals for three roles: provider, 
 - **(pass 2) Portal Admin settings** show the admin's facility details (address, city, state, zip, unit, phone), so a portal admin belongs to a `Facility`. The Provider screens also carry NPI and date hired for the admin, so `Provider` may be reused for admins.
 
 - **Provider ↔ Facility**: see `provider-facility.md` for how a provider is attached to a facility and the portal admin gap.
+- **Device ID and Add Device**: see `device-id.md` for the GS1 ID format, which fields are derived from it, and why `Device.facilityId` should be optional.
 
 ## Open questions
 
