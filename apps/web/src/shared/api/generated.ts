@@ -140,6 +140,55 @@ export interface ProviderDto {
   dateHired: string;
 }
 
+export type DeviceSortBy = typeof DeviceSortBy[keyof typeof DeviceSortBy];
+
+
+export const DeviceSortBy = {
+  model: 'model',
+  dateAdded: 'dateAdded',
+} as const;
+
+export interface DeviceDto {
+  id: string;
+  deviceId: string;
+  modelName: string;
+  /** @nullable */
+  facilityName: string | null;
+  manufactureDate: string;
+  /** @nullable */
+  lastConnectedAt: string | null;
+}
+
+export interface AddDeviceItemDto {
+  deviceId: string;
+  facilityId?: string;
+}
+
+export interface UpdateDeviceItemDto {
+  deviceId: string;
+  facilityId?: string;
+}
+
+export interface DeviceModelDto {
+  id: string;
+  name: string;
+  /** @nullable */
+  gtin: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AddDeviceModelItemDto {
+  name: string;
+  gtin?: string;
+}
+
+export interface UpdateDeviceModelItemDto {
+  name?: string;
+  /** GTIN-14. Cannot be changed once devices use the model. */
+  gtin?: string;
+}
+
 export type FacilitiesControllerGetFacilitiesParams = {
   q?: string;
   sortBy?: string;
@@ -148,6 +197,11 @@ export type FacilitiesControllerGetFacilitiesParams = {
 export type ProvidersControllerGetProvidersParams = {
   q?: string;
   sortBy?: ProviderSortBy;
+};
+
+export type DeviceControllerGetAllDevicesParams = {
+  q?: string;
+  sortBy?: DeviceSortBy;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -292,6 +346,80 @@ export const providersControllerGetProvider = (
       options);
     }
 
+export const deviceControllerGetAllDevices = (
+    params?: DeviceControllerGetAllDevicesParams,
+ options?: SecondParameter<typeof createInstance<DeviceDto[]>>,) => {
+      return createInstance<DeviceDto[]>(
+      {url: `/device`, method: 'GET',
+        params
+    },
+      options);
+    }
+
+export const deviceControllerCreateDevice = (
+    addDeviceItemDto: BodyType<AddDeviceItemDto>,
+ options?: SecondParameter<typeof createInstance<DeviceDto>>,) => {
+      return createInstance<DeviceDto>(
+      {url: `/device`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: addDeviceItemDto
+    },
+      options);
+    }
+
+export const deviceControllerUpdateDevice = (
+    id: string,
+    updateDeviceItemDto: BodyType<UpdateDeviceItemDto>,
+ options?: SecondParameter<typeof createInstance<DeviceDto>>,) => {
+      return createInstance<DeviceDto>(
+      {url: `/device/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateDeviceItemDto
+    },
+      options);
+    }
+
+export const deviceControllerDeleteDevice = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<DeviceDto>>,) => {
+      return createInstance<DeviceDto>(
+      {url: `/device/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+
+export const deviceModelControllerGetDeviceModelByGtin = (
+    gtin: string,
+ options?: SecondParameter<typeof createInstance<DeviceModelDto>>,) => {
+      return createInstance<DeviceModelDto>(
+      {url: `/device-model/${gtin}`, method: 'GET'
+    },
+      options);
+    }
+
+export const deviceModelControllerCreateDeviceModel = (
+    addDeviceModelItemDto: BodyType<AddDeviceModelItemDto>,
+ options?: SecondParameter<typeof createInstance<DeviceModelDto>>,) => {
+      return createInstance<DeviceModelDto>(
+      {url: `/device-model`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: addDeviceModelItemDto
+    },
+      options);
+    }
+
+export const deviceModelControllerUpdateDeviceModel = (
+    id: string,
+    updateDeviceModelItemDto: BodyType<UpdateDeviceModelItemDto>,
+ options?: SecondParameter<typeof createInstance<DeviceModelDto>>,) => {
+      return createInstance<DeviceModelDto>(
+      {url: `/device-model/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateDeviceModelItemDto
+    },
+      options);
+    }
+
 export type AppControllerGetHelloResult = NonNullable<Awaited<ReturnType<typeof appControllerGetHello>>>
 export type AuthControllerSignUpResult = NonNullable<Awaited<ReturnType<typeof authControllerSignUp>>>
 export type AuthControllerSignInResult = NonNullable<Awaited<ReturnType<typeof authControllerSignIn>>>
@@ -306,3 +434,10 @@ export type FacilitiesControllerUpdateFacilityResult = NonNullable<Awaited<Retur
 export type FacilitiesControllerDeleteFacilityResult = NonNullable<Awaited<ReturnType<typeof facilitiesControllerDeleteFacility>>>
 export type ProvidersControllerGetProvidersResult = NonNullable<Awaited<ReturnType<typeof providersControllerGetProviders>>>
 export type ProvidersControllerGetProviderResult = NonNullable<Awaited<ReturnType<typeof providersControllerGetProvider>>>
+export type DeviceControllerGetAllDevicesResult = NonNullable<Awaited<ReturnType<typeof deviceControllerGetAllDevices>>>
+export type DeviceControllerCreateDeviceResult = NonNullable<Awaited<ReturnType<typeof deviceControllerCreateDevice>>>
+export type DeviceControllerUpdateDeviceResult = NonNullable<Awaited<ReturnType<typeof deviceControllerUpdateDevice>>>
+export type DeviceControllerDeleteDeviceResult = NonNullable<Awaited<ReturnType<typeof deviceControllerDeleteDevice>>>
+export type DeviceModelControllerGetDeviceModelByGtinResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerGetDeviceModelByGtin>>>
+export type DeviceModelControllerCreateDeviceModelResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerCreateDeviceModel>>>
+export type DeviceModelControllerUpdateDeviceModelResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerUpdateDeviceModel>>>

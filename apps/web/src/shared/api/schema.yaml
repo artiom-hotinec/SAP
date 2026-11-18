@@ -226,6 +226,151 @@ paths:
                 $ref: '#/components/schemas/ProviderDto'
       tags:
         - Providers
+  /device:
+    get:
+      operationId: DeviceController_getAllDevices
+      parameters:
+        - name: q
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          required: false
+          in: query
+          schema:
+            $ref: '#/components/schemas/DeviceSortBy'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceDto'
+      tags:
+        - Device
+    post:
+      operationId: DeviceController_createDevice
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDeviceItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+      tags:
+        - Device
+  /device/{id}:
+    patch:
+      operationId: DeviceController_updateDevice
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeviceItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+      tags:
+        - Device
+    delete:
+      operationId: DeviceController_deleteDevice
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+      tags:
+        - Device
+  /device-model/{gtin}:
+    get:
+      operationId: DeviceModelController_getDeviceModelByGtin
+      parameters:
+        - name: gtin
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceModelDto'
+      tags:
+        - DeviceModel
+  /device-model:
+    post:
+      operationId: DeviceModelController_createDeviceModel
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDeviceModelItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceModelDto'
+      tags:
+        - DeviceModel
+  /device-model/{id}:
+    patch:
+      operationId: DeviceModelController_updateDeviceModel
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeviceModelItemDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceModelDto'
+      tags:
+        - DeviceModel
 info:
   title: SAP
   description: API documentation
@@ -506,3 +651,96 @@ components:
         - lastName
         - facilityName
         - dateHired
+    DeviceSortBy:
+      type: string
+      enum:
+        - model
+        - dateAdded
+    DeviceDto:
+      type: object
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        modelName:
+          type: string
+        facilityName:
+          type: string
+          nullable: true
+        manufactureDate:
+          type: string
+          format: date-time
+        lastConnectedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - deviceId
+        - modelName
+        - facilityName
+        - manufactureDate
+        - lastConnectedAt
+    AddDeviceItemDto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        facilityId:
+          type: string
+      required:
+        - deviceId
+    UpdateDeviceItemDto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          example: (01)00827002005112(11)210821(10)1234(21)8234
+        facilityId:
+          type: string
+      required:
+        - deviceId
+    DeviceModelDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        gtin:
+          type: string
+          nullable: true
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - gtin
+        - createdAt
+        - updatedAt
+    AddDeviceModelItemDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: SAP 2
+        gtin:
+          type: string
+          example: '00827002005112'
+      required:
+        - name
+    UpdateDeviceModelItemDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: SAP 2
+        gtin:
+          type: string
+          example: '00827002005112'
+          description: GTIN-14. Cannot be changed once devices use the model.
