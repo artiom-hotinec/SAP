@@ -78,22 +78,22 @@ model User {
 }
 
 model Facility {
-  id      String  @id @default(uuid())
+  id String @id @default(uuid())
 
-  ein     String  @unique
-  permit  String
-  npi     String
+  ein    String @unique
+  permit String
+  npi    String
 
-  name    String
-  city    String
-  state   String
-  phone   String
-  address String
-  unit    String?
-  zip     String
-  contactName String
+  name         String
+  city         String
+  state        String
+  phone        String
+  address      String
+  unit         String?
+  zip          String
+  contactName  String
   contactEmail String
-  active  Boolean @default(true)
+  active       Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -237,8 +237,9 @@ model ProviderMessage {
 // Devices
 
 model DeviceModel {
-  id   String @id @default(uuid())
-  name String @unique // KAM, KAM 2, ...
+  id   String  @id @default(uuid())
+  name String  @unique // SAP, SAP 2, ...
+  gtin String? @unique @db.VarChar(14)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -251,18 +252,18 @@ model Device {
 
   // Portals show the long GS1-style ID, the app shows the short 8-char ID.
   deviceId        String       @unique
-  shortId         String       @unique
+  shortId         String?      @unique
   displayName     String? // e.g. "Kälm CPAP 2.0"
   manufactureDate DateTime
-  status          DeviceStatus @default(INACTIVE)
+  status          DeviceStatus @default(ACTIVE)
   pairedAt        DateTime?
   lastConnectedAt DateTime?
 
   deviceModelId String
   deviceModel   DeviceModel @relation(fields: [deviceModelId], references: [id], onDelete: Restrict)
 
-  facilityId String
-  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Restrict)
+  facilityId String?
+  facility   Facility? @relation(fields: [facilityId], references: [id], onDelete: Restrict)
 
   patientId String?
   patient   Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
