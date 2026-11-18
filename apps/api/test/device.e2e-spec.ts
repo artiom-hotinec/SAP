@@ -16,6 +16,7 @@ import type { DeviceDto } from './../src/device/dto.js';
  * GET   /device?q=&sortBy=model|dateAdded -> 200 DeviceDto[]
  * POST  /device                           -> 201 DeviceDto
  * PATCH /device/:id                       -> 200 DeviceDto
+ * DELETE /device/:id                      -> 200 DeviceDto (the removed device)
  * All routes -> 401 without a valid token.
  *
  * Device ID format: (01)GTIN(11)YYMMDD(10)lot(21)serial, see
@@ -82,6 +83,7 @@ describe('Device (e2e)', () => {
     get: (url: string) => http().get(url).set('Cookie', cookie),
     post: (url: string) => http().post(url).set('Cookie', cookie),
     patch: (url: string) => http().patch(url).set('Cookie', cookie),
+    delete: (url: string) => http().delete(url).set('Cookie', cookie),
   };
 
   const created = {
@@ -192,10 +194,11 @@ describe('Device (e2e)', () => {
 
   describe('authorization', () => {
     const id = randomUUID();
-    const routes: ['get' | 'post' | 'patch', string][] = [
+    const routes: ['get' | 'post' | 'patch' | 'delete', string][] = [
       ['get', '/device'],
       ['post', '/device'],
       ['patch', `/device/${id}`],
+      ['delete', `/device/${id}`],
     ];
 
     it.each(routes)(
@@ -741,6 +744,104 @@ describe('Device (e2e)', () => {
         .patch(`/device/${randomUUID()}`)
         .send({ deviceId: deviceIdFor(gtin14()) })
         .expect(404);
+    });
+  });
+
+  describe('DELETE /device/:id', () => {
+    it('deletes the device and returns the removed DeviceDto', async () => {
+      const model = await seedModel();
+      const facility = await seedFacility();
+      const device = await seedDevice(model, { facilityId: facility.id });
+
+      const res = await authed.delete(`/device/${device.id}`).expect(200);
+
+      expect(res.body).toMatchObject({
+        id: device.id,
+        deviceId: device.deviceId,
+        modelName: model.name,
+        facilityName: facility.name,
+      });
+      expect(dto(res).manufactureDate).toMatch(/^2021-08-21/);
+    });
+
+    it('removes the row from the database', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      expect(
+        await db.device.findUnique({ where: { id: device.id } }),
+      ).toBeNull();
+    });
+
+    it('deletes a device without a facility', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+
+      const res = await authed.delete(`/device/${device.id}`).expect(200);
+
+      expect(dto(res).facilityName ?? null).toBeNull();
+    });
+
+    it('does not delete the model or facility', async () => {
+      const model = await seedModel();
+      const facility = await seedFacility();
+      const device = await seedDevice(model, { facilityId: facility.id });
+
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      expect(
+        await db.deviceModel.findUnique({ where: { id: model.id } }),
+      ).not.toBeNull();
+      expect(
+        await db.facility.findUnique({ where: { id: facility.id } }),
+      ).not.toBeNull();
+    });
+
+    it('does not touch other devices', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+      const other = await seedDevice(model);
+
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      expect(
+        await db.device.findUnique({ where: { id: other.id } }),
+      ).not.toBeNull();
+    });
+
+    it('no longer returns the device from GET /device', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      const res = await authed.get(`/device?q=${device.deviceId}`).expect(200);
+      expect(res.body).toEqual([]);
+    });
+
+    it('allows registering the same device ID again after deletion', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      await authed
+        .post('/device')
+        .send({ deviceId: device.deviceId })
+        .expect(201);
+    });
+
+    it('returns 404 for an unknown device', async () => {
+      await authed.delete(`/device/${randomUUID()}`).expect(404);
+    });
+
+    it('returns 404 when the device was already deleted', async () => {
+      const model = await seedModel();
+      const device = await seedDevice(model);
+      await authed.delete(`/device/${device.id}`).expect(200);
+
+      await authed.delete(`/device/${device.id}`).expect(404);
     });
   });
 });

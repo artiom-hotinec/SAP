@@ -144,4 +144,19 @@ export class DeviceService {
       throw error;
     }
   }
+
+  async deleteDevice(id: string) {
+    const existing = await this.db.device.findUnique({ where: { id } });
+
+    if (!existing) {
+      throw new NotFoundException();
+    }
+
+    const device = await this.db.device.delete({
+      where: { id },
+      include: deviceInclude,
+    });
+
+    return toDeviceDto(device);
+  }
 }

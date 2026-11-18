@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -9,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard.js';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiResponse } from '@nestjs/swagger';
 import {
   AddDeviceItemDto,
   DeviceDto,
@@ -26,6 +27,7 @@ export class DeviceController {
   @Get()
   @ApiResponse({
     type: DeviceDto,
+    isArray: true,
   })
   getAllDevices(@Query() query: DeviceQueryDto): Promise<DeviceDto[]> {
     return this.deviceService.getAllDevices(query);
@@ -48,5 +50,13 @@ export class DeviceController {
     @Body() body: UpdateDeviceItemDto,
   ): Promise<DeviceDto> {
     return this.deviceService.updateDevice(id, body);
+  }
+
+  @Delete(':id')
+  @ApiOkResponse({
+    type: DeviceDto,
+  })
+  deleteDevice(@Param('id') id: string): Promise<DeviceDto> {
+    return this.deviceService.deleteDevice(id);
   }
 }

@@ -36,14 +36,13 @@ export class DeviceDto {
   @ApiProperty()
   modelName: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String, nullable: true })
   facilityName: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String, format: 'date-time' })
   manufactureDate: Date;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastConnectedAt: Date | null;
 }
 
@@ -58,7 +57,11 @@ export class DeviceQueryDto {
   @IsString()
   q?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    required: false,
+    enum: DeviceSortBy,
+    enumName: 'DeviceSortBy',
+  })
   @IsOptional()
   @IsEnum(DeviceSortBy)
   sortBy?: DeviceSortBy;
