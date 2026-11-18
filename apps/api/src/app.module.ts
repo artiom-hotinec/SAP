@@ -9,6 +9,7 @@ import { StatisticsModule } from './statistics/statistics.module.js';
 import { FacilitiesModule } from './facilities/facilities.module.js';
 import { ProvidersModule } from './providers/providers.module.js';
 import { PasswordModule } from './password/password.module.js';
+import { DeviceModule } from './device/device.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PasswordModule } from './password/password.module.js';
     FacilitiesModule,
     ProvidersModule,
     PasswordModule,
+    DeviceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
