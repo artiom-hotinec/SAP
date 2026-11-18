@@ -1,5 +1,5 @@
-import { UiPagePlaceholder } from '@/shared/ui/ui-page-placeholder';
+import { DevicesList } from './devices-list';
 
 export function DevicesPage() {
-  return <UiPagePlaceholder title="Devices" />;
+  return <DevicesList />;
 }
