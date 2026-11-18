@@ -69,6 +69,8 @@ const m = /^\(01\)(\d{14})\(11\)(\d{6})\(10\)([^()]+)\(21\)([^()]+)$/.exec(
 // gtin = m[1]; date = 20 + YY, MM, DD from m[2]; lot = m[3]; serial = m[4]
 ```
 
+The web app (`apps/web/src/entities/device/lib/parse-device-id.ts`) has a client-side port of this parser. It previews Model and Date of Manufacture while the admin types and validates the ID before submit; the API stays the source of truth, so keep the two in sync.
+
 A raw scanned barcode has no parentheses, and the variable-length fields (10, 21) end at an FNC1 separator, so a scanner needs a different parser.
 
 **`POST /devices` behavior:**

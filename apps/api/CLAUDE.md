@@ -15,32 +15,39 @@ See `AGENTS.md` for NestJS Observe (production telemetry) setup and usage.
 
 ## Structure
 
-- `src/main.ts` — bootstrap: cookie parser, global `ValidationPipe({ whitelist: true })`, Swagger UI at `/api/docs` and the OpenAPI YAML at `/api/docs-yaml`; `src/app.module.ts` — root module (`ConfigModule` global, `DbModule`, `AuthModule`, `UserModule`, `StatisticsModule`, `FacilitiesModule`, `ProvidersModule`)
-- One folder per feature in `src/` (`auth`, `user`, `statistics`, `facilities`, `providers`), each with `*.module.ts`, `*.controller.ts`, `*.service.ts` and `dto.ts`. `src/app.controller.ts` is the starter `GET /` hello route
+- `src/main.ts` — bootstrap: cookie parser, global `ValidationPipe({ whitelist: true })`, Swagger UI at `/api/docs` and the OpenAPI YAML at `/api/docs-yaml`; `src/app.module.ts` — root module (`ConfigModule` global, `DbModule`, `AuthModule`, `UserModule`, `StatisticsModule`, `FacilitiesModule`, `ProvidersModule`, `DeviceModule`)
+- One folder per feature in `src/` (`auth`, `user`, `statistics`, `facilities`, `providers`, `device`), each with `*.module.ts`, `*.controller.ts`, `*.service.ts` and `dto.ts`. `src/app.controller.ts` is the starter `GET /` hello route
 - `src/db/` — `DbModule` / `DbService`: a `PrismaClient` (pg adapter) built from `DATABASE_URL`; inject `DbService` to query
 - `src/generated/prisma/` — generated Prisma client (don't edit); `prisma/schema.prisma` is the source of truth for the DB, `prisma/migrations/` holds the migrations
 - `src/types/express.d.ts` — typing for `req.session`
-- specs live beside sources as `*.spec.ts`; `test/` — e2e tests (`auth`, `statistics`, `facilities`, `providers`, `app`). They hit the real dev database and run sequentially (`fileParallelism: false`); each spec removes the rows it creates
+- specs live beside sources as `*.spec.ts`; `test/` — e2e tests (`auth`, `statistics`, `facilities`, `providers`, `device`, `app`). They hit the real dev database and run sequentially (`fileParallelism: false`); each spec removes the rows it creates
 - `docs/` — design notes; `docs/db-entities.md` holds the DB entities derived from the Figma file (planning notes, `prisma/schema.prisma` is what actually exists)
 
 ## Endpoints
 
 All routes except `POST /auth/register` and `POST /auth/login` use `AuthGuard` (401 without a valid `access-token` cookie).
 
-| Route                    | Description                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `POST /auth/register`    | Create a user, set the cookie, return `{ accessToken }` (201)                                                             |
-| `POST /auth/login`       | Sign in; sets the httpOnly `access-token` cookie (200)                                                                    |
-| `POST /auth/logout`      | Clears the cookie                                                                                                         |
-| `GET /auth/session`      | Session info from the token (`GetSessionInfoDto`)                                                                         |
-| `GET /user`              | Current user (`UserDto`)                                                                                                  |
-| `GET /statistics`        | Counts of `patients`, `facilities`, `providers`, `devices` (`StatisticsDto`)                                              |
-| `GET /facilities`        | List (`FacilityDto[]`); query `q` (name contains, case-insensitive) and `sortBy=name\|dateAdded`                          |
-| `POST /facilities`       | Create (201); duplicate `ein` → 409 `{ type: 'ein-exists' }`                                                              |
-| `PATCH /facilities/:id`  | Update name, address, city, state, zip, phone, unit, contact name/email (not `ein`/`permit`/`npi`)                        |
-| `DELETE /facilities/:id` | Delete, returns the deleted facility; also removes its providers (cascade); unknown id → 404                              |
-| `GET /providers`         | List (`ProviderDto[]`); query `q` (first or last name contains, case-insensitive) and `sortBy=providerName\|facilityName` |
-| `GET /providers/:id`     | One provider (`ProviderDto`); unknown id → 404                                                                            |
+| Route                     | Description                                                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /auth/register`     | Create a user, set the cookie, return `{ accessToken }` (201)                                                                                                                               |
+| `POST /auth/login`        | Sign in; sets the httpOnly `access-token` cookie (200)                                                                                                                                      |
+| `POST /auth/logout`       | Clears the cookie                                                                                                                                                                           |
+| `GET /auth/session`       | Session info from the token (`GetSessionInfoDto`)                                                                                                                                           |
+| `GET /user`               | Current user (`UserDto`)                                                                                                                                                                    |
+| `GET /statistics`         | Counts of `patients`, `facilities`, `providers`, `devices` (`StatisticsDto`)                                                                                                                |
+| `GET /facilities`         | List (`FacilityDto[]`); query `q` (name contains, case-insensitive) and `sortBy=name\|dateAdded`                                                                                            |
+| `POST /facilities`        | Create (201); duplicate `ein` → 409 `{ type: 'ein-exists' }`                                                                                                                                |
+| `PATCH /facilities/:id`   | Update name, address, city, state, zip, phone, unit, contact name/email (not `ein`/`permit`/`npi`)                                                                                          |
+| `DELETE /facilities/:id`  | Delete, returns the deleted facility; also removes its providers (cascade); unknown id → 404                                                                                                |
+| `GET /providers`          | List (`ProviderDto[]`); query `q` (first or last name contains, case-insensitive) and `sortBy=providerName\|facilityName`                                                                   |
+| `GET /providers/:id`      | One provider (`ProviderDto`); unknown id → 404                                                                                                                                              |
+| `GET /device`             | List (`DeviceDto[]`); query `q` (Device ID contains, case-insensitive) and `sortBy=model\|dateAdded` (default newest first)                                                                 |
+| `POST /device`            | Create from a GS1 `deviceId` (`AddDeviceItemDto`, optional `facilityId`); 400 `invalid-device-id` / `unknown-device-model` / `facility-inactive`, 404 unknown facility, 409 `device-exists` |
+| `PATCH /device/:id`       | Replace `deviceId` and facility (omitted `facilityId` clears it); same errors as create, unknown id → 404                                                                                   |
+| `DELETE /device/:id`      | Delete, returns the deleted device (`DeviceDto`); unknown id → 404                                                                                                                          |
+| `GET /device-model/:gtin` | One model by GTIN-14 (`DeviceModelDto`); bad GTIN → 400, unknown → 404                                                                                                                      |
+| `POST /device-model`      | Create (`name`, optional `gtin`); duplicate name or GTIN → 409 `device-model-exists`                                                                                                        |
+| `PATCH /device-model/:id` | Update name / GTIN; changing the GTIN of a model in use → 409 `device-model-in-use`; unknown id → 404                                                                                       |
 
 `sortBy=name` is A-Z, `sortBy=dateAdded` (the default) is newest first.
 
