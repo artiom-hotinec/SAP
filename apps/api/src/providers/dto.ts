@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateFacilityAdminUserDto } from '../user/dto.js';
 
 export class ProviderDto {
   @ApiProperty()
@@ -52,4 +62,32 @@ export class ProvidersQueryDto {
   @IsOptional()
   @IsEnum(ProviderSortBy)
   sortBy?: ProviderSortBy;
+}
+
+export class CreateFacilityAdminProviderDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  npi: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  @Type(() => Date)
+  @IsDate()
+  dateHired: Date;
+
+  @ApiProperty({ type: CreateFacilityAdminUserDto })
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => CreateFacilityAdminUserDto)
+  user: CreateFacilityAdminUserDto;
 }

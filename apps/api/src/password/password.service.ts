@@ -3,8 +3,8 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class PasswordService {
-  getSalt() {
-    return randomBytes(16).toString('hex');
+  getSalt(size = 16) {
+    return randomBytes(size).toString('hex');
   }
 
   getHash(password: string, salt: string) {

@@ -10,11 +10,15 @@ import {
   FacilitySortBy,
   UpdateFacilityItemDto,
 } from './dto.js';
-import { Prisma } from '../generated/prisma/client.js';
+import { Prisma, UserRole } from '../generated/prisma/client.js';
+import { PasswordService } from '../password/password.service.js';
 
 @Injectable()
 export class FacilitiesService {
-  constructor(private db: DbService) {}
+  constructor(
+    private db: DbService,
+    private passwordService: PasswordService,
+  ) {}
 
   getFacilities(dto: FacilitiesQueryDto) {
     const { sortBy = FacilitySortBy.DATE_ADDED, q } = dto;
@@ -35,16 +39,59 @@ export class FacilitiesService {
     });
   }
 
-  async createFacility(data: AddFacilityItemDto) {
+  async createFacility({ admin, ...facility }: AddFacilityItemDto) {
+    const { user, ...provider } = admin;
+
+    const salt = this.passwordService.getSalt();
+    const passwordHash = this.passwordService.getHash(
+      this.passwordService.getSalt(32),
+      salt,
+    );
+
     try {
-      return await this.db.facility.create({ data });
+      return await this.db.facility.create({
+        data: {
+          ...facility,
+          providers: {
+            create: {
+              ...provider,
+              user: {
+                create: {
+                  ...user,
+                  role: UserRole.PORTAL_ADMIN,
+                  salt,
+                  passwordHash,
+                  resetToken: this.passwordService.getSalt(32),
+                  resetTokenExpiresAt: new Date(
+                    Date.now() + 7 * 24 * 60 * 60 * 1000,
+                  ),
+                },
+              },
+            },
+          },
+        },
+      });
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
+        // With the pg driver adapter, P2002 has no `meta.target`; the table
+        // is on the adapter error's cause.
+        const { driverAdapterError } = (error.meta ?? {}) as {
+          driverAdapterError?: { cause?: { table?: string } };
+        };
+        const table = driverAdapterError?.cause?.table;
+
+        if (table === 'User') {
+          throw new ConflictException({ type: 'email-exists' });
+        }
+        if (table === 'Provider') {
+          throw new ConflictException({ type: 'npi-exists' });
+        }
         throw new ConflictException({ type: 'ein-exists' });
       }
+
       throw error;
     }
   }

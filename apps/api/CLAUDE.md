@@ -36,7 +36,7 @@ All routes except `POST /auth/register` and `POST /auth/login` use `AuthGuard` (
 | `GET /user`               | Current user (`UserDto`)                                                                                                                                                                    |
 | `GET /statistics`         | Counts of `patients`, `facilities`, `providers`, `devices` (`StatisticsDto`)                                                                                                                |
 | `GET /facilities`         | List (`FacilityDto[]`); query `q` (name contains, case-insensitive) and `sortBy=name\|dateAdded`                                                                                            |
-| `POST /facilities`        | Create (201); duplicate `ein` → 409 `{ type: 'ein-exists' }`                                                                                                                                |
+| `POST /facilities`        | Create (201) together with its admin (`admin`: provider fields + nested `user`, see "Facility admin"); 409 `ein-exists` / `email-exists` (admin email) / `npi-exists` (admin NPI)           |
 | `PATCH /facilities/:id`   | Update name, address, city, state, zip, phone, unit, contact name/email (not `ein`/`permit`/`npi`)                                                                                          |
 | `DELETE /facilities/:id`  | Delete, returns the deleted facility; also removes its providers (cascade); unknown id → 404                                                                                                |
 | `GET /providers`          | List (`ProviderDto[]`); query `q` (first or last name contains, case-insensitive) and `sortBy=providerName\|facilityName`                                                                   |
@@ -50,6 +50,12 @@ All routes except `POST /auth/register` and `POST /auth/login` use `AuthGuard` (
 | `PATCH /device-model/:id` | Update name / GTIN; changing the GTIN of a model in use → 409 `device-model-in-use`; unknown id → 404                                                                                       |
 
 `sortBy=name` is A-Z, `sortBy=dateAdded` (the default) is newest first.
+
+## Facility admin
+
+`POST /facilities` creates three rows in one nested Prisma write (a single transaction, no `$transaction` call): the `Facility`, a `Provider` for it, and that provider's `User` with role `PORTAL_ADMIN`. The role is always set by the server. If any insert fails, nothing is saved. The admin gets a random throwaway password plus a `resetToken` that expires in 7 days. Nothing uses `resetToken` yet, so there's no set-password / invite flow and the admin can't sign in. Admins are `Provider` rows, so `GET /providers` lists them too.
+
+Duplicate errors: with the pg driver adapter, Prisma's P2002 has no `meta.target`. The table is on `meta.driverAdapterError.cause.table`. `User` maps to `email-exists`, `Provider` to `npi-exists`, and anything else to `ein-exists`.
 
 ## Auth
 
