@@ -625,6 +625,7 @@ components:
           type: string
         npi:
           type: string
+          nullable: true
         phone:
           type: string
         address:
@@ -640,6 +641,7 @@ components:
         dateHired:
           format: date-time
           type: string
+          nullable: true
       required:
         - id
         - providerName

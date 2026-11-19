@@ -129,7 +129,8 @@ export interface ProviderDto {
   id: string;
   providerName: string;
   email: string;
-  npi: string;
+  /** @nullable */
+  npi: string | null;
   phone: string;
   address: string;
   /** @nullable */
@@ -137,7 +138,8 @@ export interface ProviderDto {
   /** @nullable */
   lastName: string | null;
   facilityName: string;
-  dateHired: string;
+  /** @nullable */
+  dateHired: string | null;
 }
 
 export type DeviceSortBy = typeof DeviceSortBy[keyof typeof DeviceSortBy];

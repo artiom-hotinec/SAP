@@ -42,7 +42,7 @@ export function ProviderDetails({
           />
           <UiReadonlyField
             label="Date Hired"
-            value={formatDate(provider.dateHired)}
+            value={provider.dateHired ? formatDate(provider.dateHired) : '--'}
           />
           <UiReadonlyField
             label="Email"
@@ -55,7 +55,7 @@ export function ProviderDetails({
               </a>
             }
           />
-          <UiReadonlyField label="NPI" value={provider.npi} />
+          <UiReadonlyField label="NPI" value={provider.npi ?? '--'} />
           <UiReadonlyField
             label="Facility Name"
             value={provider.facilityName}

@@ -8,7 +8,7 @@ import { FACILITY_FORM_STEPS, STEP_FIELDS } from '../config/steps';
 import type { FacilityFormStep } from '../config/steps';
 import { EMPTY_FACILITY_VALUES, toFormValues } from './form-values';
 import type { FacilityFormValues } from './form-values';
-import { EIN_EXISTS_MESSAGE, isEinConflict } from './is-ein-conflict';
+import { getConflict } from './get-conflict';
 import { useUpsertFacility } from './use-upsert-facility';
 
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
@@ -55,10 +55,11 @@ export function useFacilityForm({ facility, onDone }: UseFacilityFormOptions) {
   const save = form.handleSubmit((values) =>
     submit(values, {
       onError: (submitError) => {
-        // Duplicate EIN: go back to the step that owns the field.
-        if (isEinConflict(submitError)) {
-          form.setError('ein', { message: EIN_EXISTS_MESSAGE });
-          setStep(1);
+        // Duplicate EIN or admin email: show it on the field and go to its step.
+        const conflict = getConflict(submitError);
+        if (conflict) {
+          form.setError(conflict.field, { message: conflict.message });
+          setStep(conflict.step);
         }
       },
     }),
@@ -81,8 +82,8 @@ export function useFacilityForm({ facility, onDone }: UseFacilityFormOptions) {
     back,
     onSubmit,
     isPending,
-    /** Message for failures other than a duplicate EIN. */
+    /** Message for failures other than a duplicate EIN or email. */
     serverError:
-      error && !isEinConflict(error) ? GENERIC_ERROR_MESSAGE : undefined,
+      error && !getConflict(error) ? GENERIC_ERROR_MESSAGE : undefined,
   };
 }

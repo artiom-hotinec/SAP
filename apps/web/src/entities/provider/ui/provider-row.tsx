@@ -35,7 +35,7 @@ export function ProviderRow({
         <span className="truncate">{provider.providerName}</span>
       </span>
       <span className="truncate pr-4">{provider.email}</span>
-      <span className="truncate pr-4">{provider.npi}</span>
+      <span className="truncate pr-4">{provider.npi ?? '--'}</span>
       <span className="truncate">{provider.facilityName}</span>
     </Link>
   );
