@@ -20,12 +20,13 @@ import { DbService } from './../src/db/db.service.js';
  *
  * Decisions this spec pins down (the controller is still a stub, so these
  * are the contract the implementation has to meet):
- * - POST also creates the facility admin: a Provider for the new facility
- *   with a User of role PORTAL_ADMIN (body field `admin`). All three rows
- *   are written in one transaction.
+ * - POST also creates the facility admin from the contact person: a Provider
+ *   for the new facility (facility phone/address, no NPI or hire date) with a
+ *   User of role PORTAL_ADMIN (contactEmail, contactName split into first and
+ *   last name). All three rows are written in one transaction.
  * - `ein` is unique: POST with an existing EIN -> 409 `ein-exists`.
- * - Admin email / NPI are unique -> 409 `email-exists` / `npi-exists`, and
- *   no facility is created.
+ * - The admin's email is unique: a taken contactEmail -> 409 `email-exists`,
+ *   and no facility is created.
  * - `ein`, `permit`, `npi` and `active` are not editable through PATCH.
  * - `q` matches the facility name only (partial, case-insensitive), not city.
  * - `sortBy=name` is A-Z, `sortBy=dateAdded` is newest first.
@@ -76,28 +77,16 @@ describe('Facilities (e2e)', () => {
     unit: '436',
     zip: '80023',
     contactName: 'Conejo Jones',
+    // Also the admin user's email; the run marker lets afterAll find it.
     contactEmail: `${uniq('contact')}@example.com`,
-    admin: adminBody(),
     ...overrides,
   });
 
-  // Admin emails carry the run marker, so afterAll can find these users.
-  const adminBody = (
-    overrides: Record<string, unknown> = {},
-    userOverrides: Record<string, unknown> = {},
-  ) => ({
-    npi: uniq('npi'),
-    phone: '(303) 941-5555',
-    address: '7 Admin Street',
-    dateHired: '2026-01-15T00:00:00.000Z',
-    user: {
-      email: `${uniq('admin')}@example.com`,
-      firstName: 'Ada',
-      lastName: 'Admin',
-      ...userOverrides,
-    },
-    ...overrides,
-  });
+  const findAdmin = (email: string) =>
+    db.user.findUniqueOrThrow({
+      where: { email },
+      include: { provider: true },
+    });
 
   const createFacility = async (overrides: Record<string, unknown> = {}) => {
     const res = await authed
@@ -149,7 +138,7 @@ describe('Facilities (e2e)', () => {
       where: {
         OR: [
           { id: { in: created.users } },
-          { email: { startsWith: 'admin-', contains: run } },
+          { email: { startsWith: 'contact-', contains: run } },
         ],
       },
     });
@@ -199,15 +188,11 @@ describe('Facilities (e2e)', () => {
 
   describe('POST /facilities', () => {
     it('creates a facility and returns it with id, active and createdAt', async () => {
-      const { admin, ...body } = validBody();
-      const res = await authed
-        .post('/facilities')
-        .send({ ...body, admin })
-        .expect(201);
+      const body = validBody();
+      const res = await authed.post('/facilities').send(body).expect(201);
       created.facilities.push(res.body.id);
 
       expect(res.body).toMatchObject({ ...body, active: true });
-      expect(res.body).not.toHaveProperty('admin');
       expect(typeof res.body.id).toBe('string');
       expect(Number.isNaN(Date.parse(res.body.createdAt))).toBe(false);
     });
@@ -244,7 +229,6 @@ describe('Facilities (e2e)', () => {
       'zip',
       'contactName',
       'contactEmail',
-      'admin',
     ])('returns 400 when %s is missing', async (field) => {
       const body: Record<string, unknown> = validBody();
       delete body[field];
@@ -278,125 +262,6 @@ describe('Facilities (e2e)', () => {
       // in parallel on the shared DB.
       expect(await db.facility.count({ where: { ein: first.ein } })).toBe(1);
     });
-  });
-
-  describe('POST /facilities — facility admin', () => {
-    it('creates a PORTAL_ADMIN user and its provider for the facility', async () => {
-      const admin = adminBody();
-      const facility = await createFacility({ admin });
-
-      const user = await db.user.findUniqueOrThrow({
-        where: { email: admin.user.email },
-        include: { provider: true },
-      });
-      expect(user).toMatchObject({
-        role: 'PORTAL_ADMIN',
-        firstName: admin.user.firstName,
-        lastName: admin.user.lastName,
-      });
-      expect(user.provider).toMatchObject({
-        facilityId: facility.id,
-        npi: admin.npi,
-        phone: admin.phone,
-        address: admin.address,
-      });
-      expect(user.provider?.dateHired.toISOString()).toBe(admin.dateHired);
-    });
-
-    it('stores a password hash and a pending reset token for the admin', async () => {
-      const admin = adminBody();
-      await createFacility({ admin });
-
-      const user = await db.user.findUniqueOrThrow({
-        where: { email: admin.user.email },
-      });
-      expect(user.passwordHash).toMatch(/^[0-9a-f]+$/);
-      expect(user.salt).toMatch(/^[0-9a-f]+$/);
-      expect(user.resetToken).toMatch(/^[0-9a-f]{64}$/);
-      expect(user.resetTokenExpiresAt!.getTime()).toBeGreaterThan(Date.now());
-    });
-
-    it('ignores a role sent by the client', async () => {
-      const admin = adminBody({}, { role: 'SUPER_ADMIN' });
-      await createFacility({ admin });
-
-      const user = await db.user.findUniqueOrThrow({
-        where: { email: admin.user.email },
-      });
-      expect(user.role).toBe('PORTAL_ADMIN');
-    });
-
-    it('returns 409 email-exists and creates nothing when the admin email is taken', async () => {
-      const first = adminBody();
-      await createFacility({ admin: first });
-
-      const body = validBody({
-        admin: adminBody({}, { email: first.user.email }),
-      });
-      await authed
-        .post('/facilities')
-        .send(body)
-        .expect(409, { type: 'email-exists' });
-
-      expect(await db.facility.count({ where: { ein: body.ein } })).toBe(0);
-      expect(await db.provider.count({ where: { npi: body.admin.npi } })).toBe(
-        0,
-      );
-    });
-
-    it('returns 409 npi-exists and creates nothing when the admin NPI is taken', async () => {
-      const first = adminBody();
-      await createFacility({ admin: first });
-
-      const body = validBody({ admin: adminBody({ npi: first.npi }) });
-      await authed
-        .post('/facilities')
-        .send(body)
-        .expect(409, { type: 'npi-exists' });
-
-      expect(await db.facility.count({ where: { ein: body.ein } })).toBe(0);
-      expect(
-        await db.user.count({ where: { email: body.admin.user.email } }),
-      ).toBe(0);
-    });
-
-    it.each(['npi', 'phone', 'address', 'dateHired', 'user'])(
-      'returns 400 when admin.%s is missing',
-      async (field) => {
-        const admin: Record<string, unknown> = adminBody();
-        delete admin[field];
-
-        await authed.post('/facilities').send(validBody({ admin })).expect(400);
-      },
-    );
-
-    it.each(['email', 'firstName', 'lastName'])(
-      'returns 400 when admin.user.%s is missing',
-      async (field) => {
-        const admin = adminBody();
-        const user: Record<string, unknown> = { ...admin.user };
-        delete user[field];
-
-        await authed
-          .post('/facilities')
-          .send(validBody({ admin: { ...admin, user } }))
-          .expect(400);
-      },
-    );
-
-    it('returns 400 for an invalid admin email', async () => {
-      await authed
-        .post('/facilities')
-        .send(validBody({ admin: adminBody({}, { email: 'not-an-email' }) }))
-        .expect(400);
-    });
-
-    it('returns 400 for an invalid admin dateHired', async () => {
-      await authed
-        .post('/facilities')
-        .send(validBody({ admin: adminBody({ dateHired: 'not-a-date' }) }))
-        .expect(400);
-    });
 
     it('does not let the client set id, active or createdAt', async () => {
       const id = randomUUID();
@@ -414,6 +279,79 @@ describe('Facilities (e2e)', () => {
     });
   });
 
+  describe('POST /facilities — facility admin', () => {
+    it('makes the contact person a PORTAL_ADMIN provider of the facility', async () => {
+      const facility = await createFacility({ contactName: 'Conejo Jones' });
+
+      const user = await findAdmin(facility.contactEmail);
+      expect(user).toMatchObject({
+        role: 'PORTAL_ADMIN',
+        firstName: 'Conejo',
+        lastName: 'Jones',
+        phone: facility.phone,
+      });
+      expect(user.provider).toMatchObject({
+        facilityId: facility.id,
+        phone: facility.phone,
+        address: facility.address,
+        npi: null,
+        dateHired: null,
+      });
+    });
+
+    it('keeps a multi-word last name and leaves it empty for one word', async () => {
+      const long = await createFacility({
+        contactName: '  Mary  Ann van Dyke ',
+      });
+      const single = await createFacility({ contactName: 'Cher' });
+
+      expect(await findAdmin(long.contactEmail)).toMatchObject({
+        firstName: 'Mary',
+        lastName: 'Ann van Dyke',
+      });
+      expect(await findAdmin(single.contactEmail)).toMatchObject({
+        firstName: 'Cher',
+        lastName: null,
+      });
+    });
+
+    it('stores a password hash and a pending reset token for the admin', async () => {
+      const facility = await createFacility();
+
+      const user = await findAdmin(facility.contactEmail);
+      expect(user.passwordHash).toMatch(/^[0-9a-f]+$/);
+      expect(user.salt).toMatch(/^[0-9a-f]+$/);
+      expect(user.resetToken).toMatch(/^[0-9a-f]{64}$/);
+      expect(user.resetTokenExpiresAt!.getTime()).toBeGreaterThan(Date.now());
+    });
+
+    it('gives every facility its own admin (admins without NPI do not clash)', async () => {
+      const first = await createFacility();
+      const second = await createFacility();
+
+      const [a, b] = await Promise.all([
+        findAdmin(first.contactEmail),
+        findAdmin(second.contactEmail),
+      ]);
+      expect(a.provider?.facilityId).toBe(first.id);
+      expect(b.provider?.facilityId).toBe(second.id);
+    });
+
+    it('returns 409 email-exists and creates nothing when the contact email is taken', async () => {
+      const first = await createFacility();
+
+      const body = validBody({ contactEmail: first.contactEmail });
+      await authed
+        .post('/facilities')
+        .send(body)
+        .expect(409, { type: 'email-exists' });
+
+      expect(await db.facility.count({ where: { ein: body.ein } })).toBe(0);
+      expect(
+        await db.user.count({ where: { email: first.contactEmail } }),
+      ).toBe(1);
+    });
+  });
   describe('GET /facilities', () => {
     it('returns an array that includes a newly created facility', async () => {
       const facility = await createFacility();

@@ -1,15 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
-  IsDefined,
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { CreateFacilityAdminProviderDto } from '../providers/dto.js';
 
 export class FacilityDto {
   @ApiProperty()
@@ -137,12 +133,6 @@ export class AddFacilityItemDto {
   @ApiProperty()
   @IsEmail()
   contactEmail: string;
-
-  @ApiProperty({ type: CreateFacilityAdminProviderDto })
-  @IsDefined()
-  @ValidateNested()
-  @Type(() => CreateFacilityAdminProviderDto)
-  admin: CreateFacilityAdminProviderDto;
 }
 
 export class UpdateFacilityItemDto {

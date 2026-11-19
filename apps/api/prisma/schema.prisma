@@ -104,11 +104,11 @@ model Facility {
 }
 
 model Provider {
-  id        String   @id @default(uuid())
-  npi       String   @unique
+  id        String    @id @default(uuid())
+  npi       String?   @unique // null for a facility admin (PORTAL_ADMIN)
   phone     String
   address   String
-  dateHired DateTime
+  dateHired DateTime? // null for a facility admin (PORTAL_ADMIN)
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Provider" ALTER COLUMN "npi" DROP NOT NULL,
+ALTER COLUMN "dateHired" DROP NOT NULL;

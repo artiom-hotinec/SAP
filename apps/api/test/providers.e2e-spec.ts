@@ -166,7 +166,7 @@ describe('Providers (e2e)', () => {
         lastName: 'Lee',
         providerName: `Ann${run} Lee`,
         facilityName: facility.name,
-        dateHired: provider.dateHired.toISOString(),
+        dateHired: provider.dateHired!.toISOString(),
       });
     });
 
@@ -270,7 +270,7 @@ describe('Providers (e2e)', () => {
         lastName: 'Stone',
         providerName: `Bob${run} Stone`,
         facilityName: facility.name,
-        dateHired: provider.dateHired.toISOString(),
+        dateHired: provider.dateHired!.toISOString(),
       });
       expect(res.body).not.toHaveProperty('passwordHash');
       expect(res.body).not.toHaveProperty('salt');

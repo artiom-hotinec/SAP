@@ -13,6 +13,13 @@ import {
 import { Prisma, UserRole } from '../generated/prisma/client.js';
 import { PasswordService } from '../password/password.service.js';
 
+/** "Conejo Jones" → "Conejo" + "Jones"; a single word has no last name. */
+function splitName(fullName: string) {
+  const [firstName, ...rest] = fullName.trim().split(/\s+/);
+
+  return { firstName, lastName: rest.length ? rest.join(' ') : null };
+}
+
 @Injectable()
 export class FacilitiesService {
   constructor(
@@ -39,8 +46,13 @@ export class FacilitiesService {
     });
   }
 
-  async createFacility({ admin, ...facility }: AddFacilityItemDto) {
-    const { user, ...provider } = admin;
+  /**
+   * Creates the facility together with its admin: the contact person becomes
+   * a Provider of the facility with a PORTAL_ADMIN user. One nested write, so
+   * it is a single transaction.
+   */
+  async createFacility(facility: AddFacilityItemDto) {
+    const { firstName, lastName } = splitName(facility.contactName);
 
     const salt = this.passwordService.getSalt();
     const passwordHash = this.passwordService.getHash(
@@ -54,10 +66,14 @@ export class FacilitiesService {
           ...facility,
           providers: {
             create: {
-              ...provider,
+              phone: facility.phone,
+              address: facility.address,
               user: {
                 create: {
-                  ...user,
+                  email: facility.contactEmail,
+                  firstName,
+                  lastName,
+                  phone: facility.phone,
                   role: UserRole.PORTAL_ADMIN,
                   salt,
                   passwordHash,
@@ -85,9 +101,6 @@ export class FacilitiesService {
 
         if (table === 'User') {
           throw new ConflictException({ type: 'email-exists' });
-        }
-        if (table === 'Provider') {
-          throw new ConflictException({ type: 'npi-exists' });
         }
         throw new ConflictException({ type: 'ein-exists' });
       }
