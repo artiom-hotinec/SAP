@@ -38,7 +38,7 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient`: `useCreatePatientMutation` and the form field components/validators (email, ZIP, state, height 12–108 in as feet+inches sent as inches, weight 1–1500 lb).
+- [x] `entities/patient`: `useCreatePatientMutation` and the form field components/validators (email, ZIP, state, height 12–108 in as feet+inches sent as inches, weight 1–1500 lb).
 - [ ] `features/patient/upsert`: `PatientFormModal` shell with the stepper, Back/Next and per-step validation that keeps entered data when going back; steps 1–2 (personal info, address).
 - [ ] Steps 3–4: provider (defaults to the signed-in provider) and clinical info, then sleep study (dates shown only when the flag is on).
 - [ ] Step 5: optional device (only unassigned devices, from `GET /device`) with the prescribed pressure, submit, server error mapping (`email-exists`, `provider-not-found`, `device-not-found`, `device-unavailable`, other → generic alert), and invalidating the patients and statistics queries.
