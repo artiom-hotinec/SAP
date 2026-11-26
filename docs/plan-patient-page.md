@@ -53,7 +53,7 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient`: the profile header (photo or initials, name, key info) and read-only profile and clinical info sections from the Figma nodes.
+- [x] `entities/patient`: the profile header (photo or initials, name, key info) and read-only profile and clinical info sections from the Figma nodes.
 - [ ] Assigned device section (`--` when none), using what `PatientDto` provides.
 - [ ] Page layout in `views/patient-details` with a "Back to all patients" link, loading and error states, and the skeleton.
 - [ ] Update `CLAUDE.md`.

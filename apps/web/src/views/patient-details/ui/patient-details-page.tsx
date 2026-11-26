@@ -1,7 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { usePatientQuery } from '@/entities/patient';
+import {
+  PatientClinicalInfo,
+  PatientProfile,
+  usePatientQuery,
+} from '@/entities/patient';
 import { ROUTES } from '@/shared/config';
 import { UiLink } from '@/shared/ui/ui-link';
 import { UiPageTitle } from '@/shared/ui/ui-page-title';
@@ -36,9 +40,15 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
           className="h-12 w-72 animate-pulse rounded-lg bg-grey-200"
         />
       ) : (
-        <UiPageTitle className="text-grey-800">
-          {data.firstName} {data.lastName}
-        </UiPageTitle>
+        <>
+          <UiPageTitle className="mb-6 text-grey-800">
+            {data.firstName} {data.lastName}
+          </UiPageTitle>
+          <div className="flex flex-col gap-6">
+            <PatientProfile patient={data} />
+            <PatientClinicalInfo patient={data} />
+          </div>
+        </>
       )}
     </div>
   );
