@@ -35,11 +35,7 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
             : 'Failed to load patient.'}
         </p>
       ) : isPending ? (
-        <div
-          aria-busy="true"
-          aria-label="Loading patient"
-          className="h-12 w-72 animate-pulse rounded-lg bg-grey-200"
-        />
+        <PatientDetailsSkeleton />
       ) : (
         <>
           <UiPageTitle className="mb-6 text-grey-800">
@@ -52,6 +48,19 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function PatientDetailsSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading patient">
+      <div className="mb-6 h-12 w-72 animate-pulse rounded-lg bg-grey-200" />
+      <div className="flex flex-col gap-6">
+        <div className="h-100 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+        <div className="h-40 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+        <div className="h-32 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+      </div>
     </div>
   );
 }
