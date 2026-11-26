@@ -1,6 +1,7 @@
 /**
- * All form fields are strings; optional ones (`dob`, `sex`, height, `weightLb`,
- * `unit`) may be empty. Steps 3-5 add their fields in later changes.
+ * Text fields are strings; optional ones (`dob`, `sex`, height, `weightLb`,
+ * `unit`, `providerId`, dates and sleep-study numbers) may be empty. An empty
+ * `providerId` means the signed-in provider. Step 5 adds its fields later.
  */
 export interface PatientFormValues {
   firstName: string;
@@ -17,6 +18,16 @@ export interface PatientFormValues {
   zip: string;
   city: string;
   state: string;
+  providerId: string;
+  lastAppointment: string;
+  maskFitting: boolean;
+  maskFittingDate: string;
+  sleepStudy: boolean;
+  sleepStudyDate: string;
+  atHomeStudy: boolean;
+  sleepStudyBloodOxygenPct: string;
+  sleepStudyHeartRateBpm: string;
+  sleepStudySnoringHours: string;
 }
 
 export const EMPTY_PATIENT_VALUES: PatientFormValues = {
@@ -34,4 +45,14 @@ export const EMPTY_PATIENT_VALUES: PatientFormValues = {
   zip: '',
   city: '',
   state: '',
+  providerId: '',
+  lastAppointment: '',
+  maskFitting: false,
+  maskFittingDate: '',
+  sleepStudy: false,
+  sleepStudyDate: '',
+  atHomeStudy: false,
+  sleepStudyBloodOxygenPct: '',
+  sleepStudyHeartRateBpm: '',
+  sleepStudySnoringHours: '',
 };

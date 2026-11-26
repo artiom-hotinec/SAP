@@ -18,7 +18,12 @@ export const STEP_FIELDS: Record<PatientFormStep, (keyof PatientFormValues)[]> =
       'phone',
     ],
     2: ['address', 'unit', 'zip', 'city', 'state'],
-    3: [],
-    4: [],
+    3: ['providerId', 'lastAppointment', 'maskFittingDate'],
+    4: [
+      'sleepStudyDate',
+      'sleepStudyBloodOxygenPct',
+      'sleepStudyHeartRateBpm',
+      'sleepStudySnoringHours',
+    ],
     5: [],
   };

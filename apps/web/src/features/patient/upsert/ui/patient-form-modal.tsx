@@ -8,6 +8,8 @@ import { PATIENT_FORM_STEPS } from '../config/steps';
 import { usePatientForm } from '../model/use-patient-form';
 import { AddressStep } from './steps/address-step';
 import { PersonalInfoStep } from './steps/personal-info-step';
+import { ProviderStep } from './steps/provider-step';
+import { SleepStudyStep } from './steps/sleep-study-step';
 
 export interface PatientFormModalProps {
   open: boolean;
@@ -61,6 +63,8 @@ export function PatientFormModal({ open, onClose }: PatientFormModalProps) {
       <form id={formId} noValidate onSubmit={onSubmit}>
         {step === 1 && <PersonalInfoStep form={form} />}
         {step === 2 && <AddressStep form={form} />}
+        {step === 3 && <ProviderStep form={form} />}
+        {step === 4 && <SleepStudyStep form={form} />}
       </form>
     </UiFormModal>
   );
