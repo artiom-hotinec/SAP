@@ -25,5 +25,5 @@ export const STEP_FIELDS: Record<PatientFormStep, (keyof PatientFormValues)[]> =
       'sleepStudyHeartRateBpm',
       'sleepStudySnoringHours',
     ],
-    5: [],
+    5: ['deviceId', 'prescribedPressure'],
   };

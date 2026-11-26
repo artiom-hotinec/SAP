@@ -7,12 +7,16 @@ import { PATIENT_FORM_STEPS, STEP_FIELDS } from '../config/steps';
 import type { PatientFormStep } from '../config/steps';
 import { EMPTY_PATIENT_VALUES } from './form-values';
 import type { PatientFormValues } from './form-values';
+import { mapPatientError } from './map-patient-error';
+import { useCreatePatient } from './use-create-patient';
+
+export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 
 /**
  * State of the 5-step patient form. Next validates only the current step's
  * fields; Back keeps everything typed, because one form instance holds all steps.
  */
-export function usePatientForm() {
+export function usePatientForm({ onDone }: { onDone: () => void }) {
   // `onChange`: an error set by `trigger()` on Next clears once the field is valid.
   const form = useForm<PatientFormValues>({
     mode: 'onChange',
@@ -21,6 +25,7 @@ export function usePatientForm() {
     shouldUnregister: false,
   });
   const [step, setStep] = useState<PatientFormStep>(1);
+  const { submit, isPending, error } = useCreatePatient({ onSuccess: onDone });
 
   const isLastStep = step === PATIENT_FORM_STEPS;
   const canGoBack = step > 1;
@@ -35,12 +40,37 @@ export function usePatientForm() {
     if (canGoBack) setStep((current) => (current - 1) as PatientFormStep);
   };
 
+  const save = form.handleSubmit((values) =>
+    submit(values, {
+      onError: (submitError) => {
+        // Show the error on its field and go to that step.
+        const fieldError = mapPatientError(submitError);
+        if (fieldError) {
+          form.setError(fieldError.field, { message: fieldError.message });
+          setStep(fieldError.step);
+        }
+      },
+    }),
+  );
+
   // Enter inside an input submits the form: before the last step it means "Next".
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    return next();
+    return isLastStep ? save() : next();
   };
 
-  return { form, step, isLastStep, canGoBack, next, back, onSubmit };
+  return {
+    form,
+    step,
+    isLastStep,
+    canGoBack,
+    next,
+    back,
+    onSubmit,
+    isPending,
+    /** Message for failures that don't belong to a field. */
+    serverError:
+      error && !mapPatientError(error) ? GENERIC_ERROR_MESSAGE : undefined,
+  };
 }

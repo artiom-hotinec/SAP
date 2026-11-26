@@ -73,3 +73,11 @@ export function validateNumberInRange(
     (number >= min && number <= max) || `Must be between ${min} and ${max}`
   );
 }
+
+/** Prescribed pressure (cmH2O, 4-20): required once a device is chosen. */
+export function validatePressureWhen(deviceId: string, value: string) {
+  if (deviceId === '') return true;
+  if (value.trim() === '') return 'Pressure is required';
+
+  return validateNumberInRange(value, { min: 4, max: 20 });
+}
