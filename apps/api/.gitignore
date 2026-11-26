@@ -14,3 +14,4 @@ node_modules
 /.windsurf/
 /.claude/skills/
 /skills-lock.json
+/uploads

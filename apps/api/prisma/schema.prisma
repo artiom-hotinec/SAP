@@ -140,6 +140,7 @@ model Patient {
   state     String?
   unit      String?
   zip       String?
+  avatar    String?
 
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -181,6 +182,11 @@ model PatientClinicalInfo {
   maskFittingDate DateTime?
   lastAppointment DateTime?
 
+  // Baseline results from the sleep study (entered by the provider, not device data)
+  sleepStudyBloodOxygenPct Float? // "Blood Oxygen Level (%)", e.g. 90
+  sleepStudyHeartRateBpm   Int? // "Heart Rate (BPM)", e.g. 56
+  sleepStudySnoringHours   Float? // "Apneas (hours snoring)", e.g. 3
+
   patientId String  @unique
   patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
@@ -205,9 +211,11 @@ model PatientNote {
 }
 
 model PatientDocument {
-  id      String @id @default(uuid())
-  name    String
-  fileUrl String
+  id         String @id @default(uuid())
+  name       String
+  storageKey String @unique
+  mimeType   String
+  size       Int
 
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)

@@ -23,7 +23,7 @@
 
 ## Description
 
-Backend of the SAP portal, built with [Nest](https://github.com/nestjs/nest), Prisma 7 and PostgreSQL. It serves auth (JWT in an httpOnly `access-token` cookie), the current user, dashboard statistics facilities (list with search/sort, create, update, delete) and providers (list with search/sort, get by id).
+Backend of the SAP portal, built with [Nest](https://github.com/nestjs/nest), Prisma 7 and PostgreSQL. It serves auth (JWT in an httpOnly `access-token` cookie), the current user, dashboard statistics facilities (list with search/sort, create, update, delete), providers (list with search/sort, get by id) and patients (list with search/sort/filter, create with clinical info and device, update, delete, photo; plus documents, notes and messages per patient).
 
 - Interactive API docs (Swagger UI): `http://localhost:3003/api/docs`; OpenAPI YAML: `http://localhost:3003/api/docs-yaml` (the web client is generated from it)
 - Endpoints, auth, environment variables and conventions: see [`CLAUDE.md`](./CLAUDE.md)

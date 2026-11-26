@@ -15,3 +15,5 @@ coverage/
 apps/web/.next-stale-root/
 .claude/plans/
 *.tsbuildinfo
+
+/apps/api/uploads/
