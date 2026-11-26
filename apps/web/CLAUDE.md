@@ -14,7 +14,7 @@ Next.js 16 (App Router) + React 19 + Tailwind CSS 4.
 
 ## Structure
 
-- `src/app/` — Next routes, `layout.tsx`, `globals.css`, `providers/` (thin; route files only re-export from `src/views`). Routes: `/sign-in`, `/ui-kit` (public UI-kit demo), and the authenticated app shell in the `(main)` route group (`(main)/layout.tsx` renders `widgets/sidebar` next to `<main>`): `/` (dashboard), `/patients`, `/patients/[id]` (patient details: profile and clinical info), `/facilities`, `/providers`, `/providers/[id]` (provider details), `/devices`, `/settings`. `/sign-in` and `/ui-kit` sit outside `(main)`, so they have no sidebar
+- `src/app/` — Next routes, `layout.tsx`, `globals.css`, `providers/` (thin; route files only re-export from `src/views`). Routes: `/sign-in`, `/ui-kit` (public UI-kit demo), and the authenticated app shell in the `(main)` route group (`(main)/layout.tsx` renders `widgets/sidebar` next to `<main>`): `/` (dashboard), `/patients`, `/patients/[id]` (patient details: profile with photo/initials, clinical info and assigned device; no KAM Stats), `/facilities`, `/providers`, `/providers/[id]` (provider details), `/devices`, `/settings`. `/sign-in` and `/ui-kit` sit outside `(main)`, so they have no sidebar
 - `src/proxy.ts` — Next 16 proxy (formerly middleware): optimistic auth redirects based on the `access-token` cookie (no cookie → `/sign-in`; cookie on `/sign-in` → `/`; `/ui-kit` is public). Every other path, including the `(main)` routes, is protected
 - `src/` — also FSD layers: `views` (FSD pages layer), `widgets`, `features`, `entities`, `shared`. Alias `@/*` → `src/*`
 - `public/` — static assets

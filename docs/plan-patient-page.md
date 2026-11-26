@@ -56,7 +56,7 @@
 - [x] `entities/patient`: the profile header (photo or initials, name, key info) and read-only profile and clinical info sections from the Figma nodes.
 - [x] Assigned device section (`--` when none), using what `PatientDto` provides.
 - [x] Page layout in `views/patient-details` with a "Back to all patients" link, loading and error states, and the skeleton.
-- [ ] Update `CLAUDE.md`.
+- [x] Update `CLAUDE.md`.
 
 **Definition of Done:** `/patients/<id>` shows profile, clinical info, device and photo (initials fallback) matching Figma, with no KAM Stats section.
 **Tests:** Manual browser check against the Figma nodes for a patient with and without a device and with empty optional fields; `npm run lint` and `npm run build` pass.
