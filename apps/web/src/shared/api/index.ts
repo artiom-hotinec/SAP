@@ -17,6 +17,7 @@ export {
   patientControllerGetPatient,
   PatientFilterBy,
   PatientSortBy,
+  Sex,
   providersControllerGetProvider,
   providersControllerGetProviders,
   ProviderSortBy,
