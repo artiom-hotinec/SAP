@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import {
   PatientClinicalInfo,
+  PatientDevice,
   PatientProfile,
   usePatientQuery,
 } from '@/entities/patient';
@@ -47,6 +48,7 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
           <div className="flex flex-col gap-6">
             <PatientProfile patient={data} />
             <PatientClinicalInfo patient={data} />
+            <PatientDevice />
           </div>
         </>
       )}
