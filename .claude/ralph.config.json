@@ -1,0 +1,26 @@
+{
+  "maxIterations": 10,
+  "maxTurns": 500,
+  "maxAttemptsPerIssue": 3,
+  "reviewModel": "claude-opus-5-5",
+  "baseBranch": "main",
+  "prompt": "Read .claude/ralph.md and follow the rules provided therein. Take the next open issue from the milestone '{milestone}' and implement it in the branch '{branch}'.",
+  "phases": [
+    {
+      "milestone": "Phase 3: Avatar backend (upload and serve)",
+      "branch": "feature/phase-8"
+    },
+    {
+      "milestone": "Phase 4: Avatar UI",
+      "branch": "feature/phase-9"
+    },
+    {
+      "milestone": "Phase 5: Password change",
+      "branch": "feature/phase-10"
+    },
+    {
+      "milestone": "Phase 6: UI verification and documentation",
+      "branch": "feature/phase-11"
+    }
+  ]
+}
