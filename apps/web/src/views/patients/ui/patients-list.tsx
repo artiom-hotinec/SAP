@@ -7,6 +7,7 @@ import {
   PatientRow,
   usePatientsQuery,
 } from '@/entities/patient';
+import { CreatePatientButton } from '@/features/patient/upsert';
 import type { PatientFilterBy, PatientSortBy } from '@/shared/api';
 import { useDebouncedValue } from '@/shared/lib';
 import { UiDropdown } from '@/shared/ui/ui-dropdown';
@@ -51,6 +52,7 @@ export function PatientsList() {
             value={search}
             onValueChange={setSearch}
           />
+          <CreatePatientButton />
         </div>
       </div>
 
