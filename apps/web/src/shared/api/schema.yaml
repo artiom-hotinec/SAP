@@ -371,6 +371,373 @@ paths:
                 $ref: '#/components/schemas/DeviceModelDto'
       tags:
         - DeviceModel
+  /patients:
+    get:
+      operationId: PatientController_getAllPatients
+      parameters:
+        - name: q
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          required: false
+          in: query
+          schema:
+            $ref: '#/components/schemas/PatientSortBy'
+        - name: filterBy
+          required: false
+          in: query
+          schema:
+            $ref: '#/components/schemas/PatientFilterBy'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientDto'
+      tags:
+        - Patient
+    post:
+      operationId: PatientController_createPatient
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+      tags:
+        - Patient
+  /patients/{id}:
+    get:
+      operationId: PatientController_getPatient
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+      tags:
+        - Patient
+    patch:
+      operationId: PatientController_updatePatient
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePatientDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+      tags:
+        - Patient
+    delete:
+      operationId: PatientController_deletePatient
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+      tags:
+        - Patient
+  /patients/{id}/photo:
+    put:
+      operationId: PatientController_addPhoto
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+        '400':
+          description: invalid-photo (not JPG/PNG/TIFF, or over 5 MB)
+        '404':
+          description: Unknown patient
+      tags:
+        - Patient
+    get:
+      operationId: PatientController_getPhoto
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Unknown patient or no photo
+      tags:
+        - Patient
+    delete:
+      operationId: PatientController_deletePhoto
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDto'
+        '404':
+          description: Unknown patient or no photo
+      tags:
+        - Patient
+  /patients/{patientId}/messages:
+    get:
+      operationId: PatientMessageController_getMessages
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientMessageDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientMessage
+    post:
+      operationId: PatientMessageController_sendMessage
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientMessageDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientMessageDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientMessage
+  /patients/{patientId}/documents:
+    get:
+      operationId: PatientDocumentController_getDocuments
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientDocumentDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientDocument
+    post:
+      operationId: PatientDocumentController_uploadDocument
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadPatientDocumentDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDocumentDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientDocument
+  /patients/{patientId}/documents/{documentId}/file:
+    get:
+      operationId: PatientDocumentController_downloadDocument
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: documentId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Unknown patient or document
+      tags:
+        - PatientDocument
+  /patients/{patientId}/documents/{documentId}:
+    delete:
+      operationId: PatientDocumentController_deleteDocument
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: documentId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ''
+        '404':
+          description: Unknown patient or document
+      tags:
+        - PatientDocument
+  /patients/{patientId}/notes:
+    get:
+      operationId: PatientNoteController_getNotes
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientNoteDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientNote
+    post:
+      operationId: PatientNoteController_createNote
+      parameters:
+        - name: patientId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientNoteDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientNoteDto'
+        '404':
+          description: Unknown patient
+      tags:
+        - PatientNote
 info:
   title: SAP
   description: API documentation
@@ -724,7 +1091,6 @@ components:
         - name
         - gtin
         - createdAt
-        - updatedAt
     AddDeviceModelItemDto:
       type: object
       properties:
@@ -746,3 +1112,386 @@ components:
           type: string
           example: '00827002005112'
           description: GTIN-14. Cannot be changed once devices use the model.
+    PatientSortBy:
+      type: string
+      enum:
+        - lastName
+        - dateAdded
+        - unreadMessages
+    PatientFilterBy:
+      type: string
+      enum:
+        - allPatients
+        - activePatients
+        - inActivePatients
+        - myPatients
+    Sex:
+      type: string
+      enum:
+        - FEMALE
+        - MALE
+        - OTHER
+    PatientDto:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        dob:
+          type: string
+          format: date-time
+          nullable: true
+        sex:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Sex'
+        heightIn:
+          type: number
+          nullable: true
+        weightLb:
+          type: number
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        zip:
+          type: string
+          nullable: true
+        providerId:
+          type: string
+        providerName:
+          type: string
+          description: Provider first + last name
+        lastAppointment:
+          type: string
+          format: date-time
+          nullable: true
+        registered:
+          type: boolean
+          description: Has the patient registered in the mobile app (userId set)
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - phone
+        - dob
+        - sex
+        - heightIn
+        - weightLb
+        - address
+        - city
+        - state
+        - unit
+        - zip
+        - providerId
+        - providerName
+        - lastAppointment
+        - registered
+        - createdAt
+    CreatePatientClinicalInfoDto:
+      type: object
+      properties:
+        lastAppointment:
+          type: string
+          format: date
+          example: '2021-12-11'
+        maskFitting:
+          type: boolean
+        maskFittingDate:
+          type: string
+          format: date
+          description: Required when maskFitting is true
+        sleepStudy:
+          type: boolean
+        sleepStudyDate:
+          type: string
+          format: date
+          description: Required when sleepStudy is true
+        atHomeStudy:
+          type: boolean
+        sleepStudyBloodOxygenPct:
+          type: number
+          example: 90
+        sleepStudyHeartRateBpm:
+          type: number
+          example: 56
+        sleepStudySnoringHours:
+          type: number
+          example: 3
+          description: Apneas, hours snoring
+      required:
+        - maskFitting
+        - sleepStudy
+    CreatePatientDeviceDto:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          example: (01)00827002005112(11)210821(10)1234(21)8234
+        prescribedPressure:
+          type: number
+          example: 10
+          description: cmH2O
+      required:
+        - deviceId
+        - prescribedPressure
+    CreatePatientDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Wayne
+        lastName:
+          type: string
+          example: Bernard
+        dob:
+          type: string
+          format: date
+          example: '1971-02-20'
+        sex:
+          allOf:
+            - $ref: '#/components/schemas/Sex'
+        heightIn:
+          type: number
+          example: 71
+          description: Total inches (ft * 12 + in)
+        weightLb:
+          type: number
+          example: 220
+        email:
+          type: string
+          example: waynebernard@gmail.com
+        phone:
+          type: string
+          example: (303) 941-5555
+        address:
+          type: string
+          example: 650 Hunt Club Lane
+        unit:
+          type: string
+        zip:
+          type: string
+          example: '80014'
+        city:
+          type: string
+          example: Denver
+        state:
+          type: string
+          example: CO
+        providerId:
+          type: string
+          description: Defaults to the signed-in provider
+        clinicalInfo:
+          $ref: '#/components/schemas/CreatePatientClinicalInfoDto'
+        device:
+          $ref: '#/components/schemas/CreatePatientDeviceDto'
+      required:
+        - firstName
+        - lastName
+        - email
+        - phone
+        - address
+        - zip
+        - city
+        - state
+        - clinicalInfo
+    UpdatePatientClinicalInfoDto:
+      type: object
+      properties:
+        lastAppointment:
+          type: string
+          format: date
+          example: '2021-12-11'
+        maskFitting:
+          type: boolean
+        maskFittingDate:
+          type: string
+          format: date
+          description: Required when maskFitting is true
+        sleepStudy:
+          type: boolean
+        sleepStudyDate:
+          type: string
+          format: date
+          description: Required when sleepStudy is true
+        atHomeStudy:
+          type: boolean
+        sleepStudyBloodOxygenPct:
+          type: number
+          example: 90
+        sleepStudyHeartRateBpm:
+          type: number
+          example: 56
+        sleepStudySnoringHours:
+          type: number
+          example: 3
+          description: Apneas, hours snoring
+    UpdatePatientDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Wayne
+        lastName:
+          type: string
+          example: Bernard
+        dob:
+          type: string
+          format: date
+          example: '1971-02-20'
+        sex:
+          allOf:
+            - $ref: '#/components/schemas/Sex'
+        heightIn:
+          type: number
+          example: 71
+          description: Total inches (ft * 12 + in)
+        weightLb:
+          type: number
+          example: 220
+        email:
+          type: string
+          example: waynebernard@gmail.com
+        phone:
+          type: string
+          example: (303) 941-5555
+        address:
+          type: string
+          example: 650 Hunt Club Lane
+        unit:
+          type: string
+        zip:
+          type: string
+          example: '80014'
+        city:
+          type: string
+          example: Denver
+        state:
+          type: string
+          example: CO
+        providerId:
+          type: string
+          description: Omitted = keep the current provider
+        clinicalInfo:
+          $ref: '#/components/schemas/UpdatePatientClinicalInfoDto'
+        device:
+          nullable: true
+          description: >-
+            Omitted = unchanged; null = unassign the device; another deviceId =
+            reassign
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/CreatePatientDeviceDto'
+    PatientMessageDto:
+      type: object
+      properties:
+        id:
+          type: string
+        body:
+          type: string
+        direction:
+          type: string
+          enum:
+            - PROVIDER_TO_PATIENT
+            - PATIENT_TO_PROVIDER
+          example: PROVIDER_TO_PATIENT
+        createdAt:
+          type: string
+          format: date-time
+        providerId:
+          type: string
+        providerName:
+          type: string
+          example: first + last name, falls back to email, like notes
+      required:
+        - id
+        - body
+        - direction
+        - createdAt
+        - providerId
+        - providerName
+    CreatePatientMessageDto:
+      type: object
+      properties:
+        body:
+          type: string
+          example: Patient reports mask discomfort, refit scheduled.
+      required:
+        - body
+    PatientDocumentDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        mimeType:
+          type: string
+        size:
+          type: number
+        uploadedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - mimeType
+        - size
+        - uploadedAt
+    UploadPatientDocumentDto:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+    PatientNoteDto:
+      type: object
+      properties:
+        id:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        authorId:
+          type: string
+        authorName:
+          type: string
+          description: Author first + last name, falls back to email
+      required:
+        - id
+        - body
+        - createdAt
+        - authorId
+        - authorName
+    CreatePatientNoteDto:
+      type: object
+      properties:
+        body:
+          type: string
+          example: Patient reports mask discomfort, refit scheduled.
+      required:
+        - body

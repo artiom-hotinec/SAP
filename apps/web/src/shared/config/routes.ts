@@ -13,4 +13,8 @@ export const ROUTES = {
 export const providerDetailsRoute = (id: string) =>
   `${ROUTES.providers}/${encodeURIComponent(id)}`;
 
+/** Path of a single patient's details page. */
+export const patientDetailsRoute = (id: string) =>
+  `${ROUTES.patients}/${encodeURIComponent(id)}`;
+
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

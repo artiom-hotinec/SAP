@@ -21,7 +21,8 @@ npm run dev:web   # frontend on http://localhost:3000
 | `/providers/[id]` | same as `/`; provider details                                                   |
 | `/settings`       | same as `/`; account information and change password (drawer)                   |
 | `/devices`        | same as `/`; devices list (search, sort, details, add, edit, delete, add model) |
-| `/patients`       | same as `/`; placeholder page for now                                           |
+| `/patients`       | same as `/`; patients list (search, sort, filter; rows link to details)         |
+| `/patients/[id]`  | same as `/`; patient details (name header only for now)                         |
 | `/sign-in`        | guests only; with the cookie → `/`                                              |
 | `/ui-kit`         | public demo of the UI kit components in `src/shared/ui`                         |
 
@@ -45,7 +46,7 @@ npm run api:generate -w web   # regenerate generated.ts
 ```
 src/
   app/        Next routes (thin re-exports), layout, providers
-  views/      FSD pages layer: dashboard, patients, facilities, providers, provider-details, devices, settings, sign-in, ui-kit
+  views/      FSD pages layer: dashboard, patients, facilities, patient-details, providers, provider-details, devices, settings, sign-in, ui-kit
   widgets/    sidebar
   features/   auth/sign-in, auth/sign-out, device/delete, device/upsert, device-model/create, facility/delete, facility/upsert, user/change-password
   entities/   session, statistics, user, facility, provider, device, device-model

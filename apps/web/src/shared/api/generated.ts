@@ -177,7 +177,7 @@ export interface DeviceModelDto {
   /** @nullable */
   gtin: string | null;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface AddDeviceModelItemDto {
@@ -189,6 +189,195 @@ export interface UpdateDeviceModelItemDto {
   name?: string;
   /** GTIN-14. Cannot be changed once devices use the model. */
   gtin?: string;
+}
+
+export type PatientSortBy = typeof PatientSortBy[keyof typeof PatientSortBy];
+
+
+export const PatientSortBy = {
+  lastName: 'lastName',
+  dateAdded: 'dateAdded',
+  unreadMessages: 'unreadMessages',
+} as const;
+
+export type PatientFilterBy = typeof PatientFilterBy[keyof typeof PatientFilterBy];
+
+
+export const PatientFilterBy = {
+  allPatients: 'allPatients',
+  activePatients: 'activePatients',
+  inActivePatients: 'inActivePatients',
+  myPatients: 'myPatients',
+} as const;
+
+export type Sex = typeof Sex[keyof typeof Sex];
+
+
+export const Sex = {
+  FEMALE: 'FEMALE',
+  MALE: 'MALE',
+  OTHER: 'OTHER',
+} as const;
+
+export interface PatientDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  /** @nullable */
+  dob: string | null;
+  sex: Sex | null;
+  /** @nullable */
+  heightIn: number | null;
+  /** @nullable */
+  weightLb: number | null;
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  city: string | null;
+  /** @nullable */
+  state: string | null;
+  /** @nullable */
+  unit: string | null;
+  /** @nullable */
+  zip: string | null;
+  providerId: string;
+  /** Provider first + last name */
+  providerName: string;
+  /** @nullable */
+  lastAppointment: string | null;
+  /** Has the patient registered in the mobile app (userId set) */
+  registered: boolean;
+  createdAt: string;
+}
+
+export interface CreatePatientClinicalInfoDto {
+  lastAppointment?: string;
+  maskFitting: boolean;
+  /** Required when maskFitting is true */
+  maskFittingDate?: string;
+  sleepStudy: boolean;
+  /** Required when sleepStudy is true */
+  sleepStudyDate?: string;
+  atHomeStudy?: boolean;
+  sleepStudyBloodOxygenPct?: number;
+  sleepStudyHeartRateBpm?: number;
+  /** Apneas, hours snoring */
+  sleepStudySnoringHours?: number;
+}
+
+export interface CreatePatientDeviceDto {
+  deviceId: string;
+  /** cmH2O */
+  prescribedPressure: number;
+}
+
+export interface CreatePatientDto {
+  firstName: string;
+  lastName: string;
+  dob?: string;
+  sex?: Sex;
+  /** Total inches (ft * 12 + in) */
+  heightIn?: number;
+  weightLb?: number;
+  email: string;
+  phone: string;
+  address: string;
+  unit?: string;
+  zip: string;
+  city: string;
+  state: string;
+  /** Defaults to the signed-in provider */
+  providerId?: string;
+  clinicalInfo: CreatePatientClinicalInfoDto;
+  device?: CreatePatientDeviceDto;
+}
+
+export interface UpdatePatientClinicalInfoDto {
+  lastAppointment?: string;
+  maskFitting?: boolean;
+  /** Required when maskFitting is true */
+  maskFittingDate?: string;
+  sleepStudy?: boolean;
+  /** Required when sleepStudy is true */
+  sleepStudyDate?: string;
+  atHomeStudy?: boolean;
+  sleepStudyBloodOxygenPct?: number;
+  sleepStudyHeartRateBpm?: number;
+  /** Apneas, hours snoring */
+  sleepStudySnoringHours?: number;
+}
+
+export interface UpdatePatientDto {
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  sex?: Sex;
+  /** Total inches (ft * 12 + in) */
+  heightIn?: number;
+  weightLb?: number;
+  email?: string;
+  phone?: string;
+  address?: string;
+  unit?: string;
+  zip?: string;
+  city?: string;
+  state?: string;
+  /** Omitted = keep the current provider */
+  providerId?: string;
+  clinicalInfo?: UpdatePatientClinicalInfoDto;
+  /**
+     * Omitted = unchanged; null = unassign the device; another deviceId = reassign
+     * @nullable
+     */
+  device?: CreatePatientDeviceDto | null;
+}
+
+export type PatientMessageDtoDirection = typeof PatientMessageDtoDirection[keyof typeof PatientMessageDtoDirection];
+
+
+export const PatientMessageDtoDirection = {
+  PROVIDER_TO_PATIENT: 'PROVIDER_TO_PATIENT',
+  PATIENT_TO_PROVIDER: 'PATIENT_TO_PROVIDER',
+} as const;
+
+export interface PatientMessageDto {
+  id: string;
+  body: string;
+  direction: PatientMessageDtoDirection;
+  createdAt: string;
+  providerId: string;
+  providerName: string;
+}
+
+export interface CreatePatientMessageDto {
+  body: string;
+}
+
+export interface PatientDocumentDto {
+  id: string;
+  name: string;
+  mimeType: string;
+  size: number;
+  uploadedAt: string;
+}
+
+export interface UploadPatientDocumentDto {
+  file: Blob | File;
+}
+
+export interface PatientNoteDto {
+  id: string;
+  body: string;
+  createdAt: string;
+  authorId: string;
+  /** Author first + last name, falls back to email */
+  authorName: string;
+}
+
+export interface CreatePatientNoteDto {
+  body: string;
 }
 
 export type FacilitiesControllerGetFacilitiesParams = {
@@ -204,6 +393,16 @@ export type ProvidersControllerGetProvidersParams = {
 export type DeviceControllerGetAllDevicesParams = {
   q?: string;
   sortBy?: DeviceSortBy;
+};
+
+export type PatientControllerGetAllPatientsParams = {
+  q?: string;
+  sortBy?: PatientSortBy;
+  filterBy?: PatientFilterBy;
+};
+
+export type PatientControllerAddPhotoBody = {
+  file: Blob | File;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -422,6 +621,176 @@ export const deviceModelControllerUpdateDeviceModel = (
       options);
     }
 
+export const patientControllerGetAllPatients = (
+    params?: PatientControllerGetAllPatientsParams,
+ options?: SecondParameter<typeof createInstance<PatientDto[]>>,) => {
+      return createInstance<PatientDto[]>(
+      {url: `/patients`, method: 'GET',
+        params
+    },
+      options);
+    }
+
+export const patientControllerCreatePatient = (
+    createPatientDto: BodyType<CreatePatientDto>,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {
+      return createInstance<PatientDto>(
+      {url: `/patients`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createPatientDto
+    },
+      options);
+    }
+
+export const patientControllerGetPatient = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {
+      return createInstance<PatientDto>(
+      {url: `/patients/${id}`, method: 'GET'
+    },
+      options);
+    }
+
+export const patientControllerUpdatePatient = (
+    id: string,
+    updatePatientDto: BodyType<UpdatePatientDto>,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {
+      return createInstance<PatientDto>(
+      {url: `/patients/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updatePatientDto
+    },
+      options);
+    }
+
+export const patientControllerDeletePatient = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {
+      return createInstance<PatientDto>(
+      {url: `/patients/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+
+export const patientControllerAddPhoto = (
+    id: string,
+    patientControllerAddPhotoBody: BodyType<PatientControllerAddPhotoBody>,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {const formData = new FormData();
+formData.append(`file`, patientControllerAddPhotoBody.file);
+
+      return createInstance<PatientDto>(
+      {url: `/patients/${id}/photo`, method: 'PUT',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData
+    },
+      options);
+    }
+
+export const patientControllerGetPhoto = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<Blob>>,) => {
+      return createInstance<Blob>(
+      {url: `/patients/${id}/photo`, method: 'GET',
+        responseType: 'blob'
+    },
+      options);
+    }
+
+export const patientControllerDeletePhoto = (
+    id: string,
+ options?: SecondParameter<typeof createInstance<PatientDto>>,) => {
+      return createInstance<PatientDto>(
+      {url: `/patients/${id}/photo`, method: 'DELETE'
+    },
+      options);
+    }
+
+export const patientMessageControllerGetMessages = (
+    patientId: string,
+ options?: SecondParameter<typeof createInstance<PatientMessageDto[]>>,) => {
+      return createInstance<PatientMessageDto[]>(
+      {url: `/patients/${patientId}/messages`, method: 'GET'
+    },
+      options);
+    }
+
+export const patientMessageControllerSendMessage = (
+    patientId: string,
+    createPatientMessageDto: BodyType<CreatePatientMessageDto>,
+ options?: SecondParameter<typeof createInstance<PatientMessageDto>>,) => {
+      return createInstance<PatientMessageDto>(
+      {url: `/patients/${patientId}/messages`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createPatientMessageDto
+    },
+      options);
+    }
+
+export const patientDocumentControllerGetDocuments = (
+    patientId: string,
+ options?: SecondParameter<typeof createInstance<PatientDocumentDto[]>>,) => {
+      return createInstance<PatientDocumentDto[]>(
+      {url: `/patients/${patientId}/documents`, method: 'GET'
+    },
+      options);
+    }
+
+export const patientDocumentControllerUploadDocument = (
+    patientId: string,
+    uploadPatientDocumentDto: BodyType<UploadPatientDocumentDto>,
+ options?: SecondParameter<typeof createInstance<PatientDocumentDto>>,) => {const formData = new FormData();
+formData.append(`file`, uploadPatientDocumentDto.file);
+
+      return createInstance<PatientDocumentDto>(
+      {url: `/patients/${patientId}/documents`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData
+    },
+      options);
+    }
+
+export const patientDocumentControllerDownloadDocument = (
+    patientId: string,
+    documentId: string,
+ options?: SecondParameter<typeof createInstance<Blob>>,) => {
+      return createInstance<Blob>(
+      {url: `/patients/${patientId}/documents/${documentId}/file`, method: 'GET',
+        responseType: 'blob'
+    },
+      options);
+    }
+
+export const patientDocumentControllerDeleteDocument = (
+    patientId: string,
+    documentId: string,
+ options?: SecondParameter<typeof createInstance<void>>,) => {
+      return createInstance<void>(
+      {url: `/patients/${patientId}/documents/${documentId}`, method: 'DELETE'
+    },
+      options);
+    }
+
+export const patientNoteControllerGetNotes = (
+    patientId: string,
+ options?: SecondParameter<typeof createInstance<PatientNoteDto[]>>,) => {
+      return createInstance<PatientNoteDto[]>(
+      {url: `/patients/${patientId}/notes`, method: 'GET'
+    },
+      options);
+    }
+
+export const patientNoteControllerCreateNote = (
+    patientId: string,
+    createPatientNoteDto: BodyType<CreatePatientNoteDto>,
+ options?: SecondParameter<typeof createInstance<PatientNoteDto>>,) => {
+      return createInstance<PatientNoteDto>(
+      {url: `/patients/${patientId}/notes`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createPatientNoteDto
+    },
+      options);
+    }
+
 export type AppControllerGetHelloResult = NonNullable<Awaited<ReturnType<typeof appControllerGetHello>>>
 export type AuthControllerSignUpResult = NonNullable<Awaited<ReturnType<typeof authControllerSignUp>>>
 export type AuthControllerSignInResult = NonNullable<Awaited<ReturnType<typeof authControllerSignIn>>>
@@ -443,3 +812,19 @@ export type DeviceControllerDeleteDeviceResult = NonNullable<Awaited<ReturnType<
 export type DeviceModelControllerGetDeviceModelByGtinResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerGetDeviceModelByGtin>>>
 export type DeviceModelControllerCreateDeviceModelResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerCreateDeviceModel>>>
 export type DeviceModelControllerUpdateDeviceModelResult = NonNullable<Awaited<ReturnType<typeof deviceModelControllerUpdateDeviceModel>>>
+export type PatientControllerGetAllPatientsResult = NonNullable<Awaited<ReturnType<typeof patientControllerGetAllPatients>>>
+export type PatientControllerCreatePatientResult = NonNullable<Awaited<ReturnType<typeof patientControllerCreatePatient>>>
+export type PatientControllerGetPatientResult = NonNullable<Awaited<ReturnType<typeof patientControllerGetPatient>>>
+export type PatientControllerUpdatePatientResult = NonNullable<Awaited<ReturnType<typeof patientControllerUpdatePatient>>>
+export type PatientControllerDeletePatientResult = NonNullable<Awaited<ReturnType<typeof patientControllerDeletePatient>>>
+export type PatientControllerAddPhotoResult = NonNullable<Awaited<ReturnType<typeof patientControllerAddPhoto>>>
+export type PatientControllerGetPhotoResult = NonNullable<Awaited<ReturnType<typeof patientControllerGetPhoto>>>
+export type PatientControllerDeletePhotoResult = NonNullable<Awaited<ReturnType<typeof patientControllerDeletePhoto>>>
+export type PatientMessageControllerGetMessagesResult = NonNullable<Awaited<ReturnType<typeof patientMessageControllerGetMessages>>>
+export type PatientMessageControllerSendMessageResult = NonNullable<Awaited<ReturnType<typeof patientMessageControllerSendMessage>>>
+export type PatientDocumentControllerGetDocumentsResult = NonNullable<Awaited<ReturnType<typeof patientDocumentControllerGetDocuments>>>
+export type PatientDocumentControllerUploadDocumentResult = NonNullable<Awaited<ReturnType<typeof patientDocumentControllerUploadDocument>>>
+export type PatientDocumentControllerDownloadDocumentResult = NonNullable<Awaited<ReturnType<typeof patientDocumentControllerDownloadDocument>>>
+export type PatientDocumentControllerDeleteDocumentResult = NonNullable<Awaited<ReturnType<typeof patientDocumentControllerDeleteDocument>>>
+export type PatientNoteControllerGetNotesResult = NonNullable<Awaited<ReturnType<typeof patientNoteControllerGetNotes>>>
+export type PatientNoteControllerCreateNoteResult = NonNullable<Awaited<ReturnType<typeof patientNoteControllerCreateNote>>>

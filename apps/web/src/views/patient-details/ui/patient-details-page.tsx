@@ -1,0 +1,45 @@
+'use client';
+
+import Image from 'next/image';
+import { usePatientQuery } from '@/entities/patient';
+import { ROUTES } from '@/shared/config';
+import { UiLink } from '@/shared/ui/ui-link';
+import { UiPageTitle } from '@/shared/ui/ui-page-title';
+
+export interface PatientDetailsPageProps {
+  id: string;
+}
+
+export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
+  const { data, isPending, isError, error } = usePatientQuery(id);
+
+  return (
+    <div className="-mt-5.5 w-full max-w-266.75">
+      <UiLink
+        href={ROUTES.patients}
+        className="mb-5.25 inline-flex items-center gap-2 text-blue-50!"
+      >
+        <Image src="/icons/arrow-left.svg" alt="" width={24} height={24} />
+        Back to all patients
+      </UiLink>
+
+      {isError ? (
+        <p role="alert" className="text-body-md text-grey-700">
+          {error.response?.status === 404
+            ? 'Patient not found.'
+            : 'Failed to load patient.'}
+        </p>
+      ) : isPending ? (
+        <div
+          aria-busy="true"
+          aria-label="Loading patient"
+          className="h-12 w-72 animate-pulse rounded-lg bg-grey-200"
+        />
+      ) : (
+        <UiPageTitle className="text-grey-800">
+          {data.firstName} {data.lastName}
+        </UiPageTitle>
+      )}
+    </div>
+  );
+}
