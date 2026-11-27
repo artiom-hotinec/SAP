@@ -22,7 +22,7 @@ export class DeviceModelDto {
   @ApiProperty()
   createdAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   updatedAt?: Date;
 }
 
@@ -44,6 +44,9 @@ export class DeviceDto {
 
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastConnectedAt: Date | null;
+
+  @ApiProperty({ description: 'Assigned to a patient' })
+  assigned: boolean;
 }
 
 export enum DeviceSortBy {

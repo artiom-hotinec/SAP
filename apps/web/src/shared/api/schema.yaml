@@ -1044,6 +1044,9 @@ components:
           type: string
           format: date-time
           nullable: true
+        assigned:
+          type: boolean
+          description: Assigned to a patient
       required:
         - id
         - deviceId
@@ -1051,6 +1054,7 @@ components:
         - facilityName
         - manufactureDate
         - lastConnectedAt
+        - assigned
     AddDeviceItemDto:
       type: object
       properties:

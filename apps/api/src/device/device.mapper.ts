@@ -17,4 +17,5 @@ export const toDeviceDto = (device: DeviceWithNames): DeviceDto => ({
   facilityName: device.facility?.name ?? null,
   manufactureDate: device.manufactureDate,
   lastConnectedAt: device.lastConnectedAt,
+  assigned: device.patientId !== null,
 });

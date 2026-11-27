@@ -1,5 +1,26 @@
+export { useCreatePatientMutation } from './api/patient-mutations';
 export { usePatientQuery } from './api/patient-query';
 export { patientsQueryKey, usePatientsQuery } from './api/patients-query';
 export { PATIENT_ROW_GRID } from './config/row-grid';
+export {
+  MAX_HEIGHT_IN,
+  MAX_WEIGHT_LB,
+  MIN_HEIGHT_IN,
+  MIN_WEIGHT_LB,
+  fromHeightIn,
+  toHeightIn,
+  validateAddress,
+  validateCity,
+  validateEmail,
+  validateFirstName,
+  validateHeight,
+  validateLastName,
+  validatePhone,
+  validateState,
+  validateWeight,
+  validateZip,
+} from './lib/validation';
+export { PatientHeightField } from './ui/patient-height-field';
+export type { PatientHeightFieldProps } from './ui/patient-height-field';
 export { PatientRow } from './ui/patient-row';
 export type { PatientRowProps } from './ui/patient-row';
