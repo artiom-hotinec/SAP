@@ -6,6 +6,9 @@ import {
 } from '@/shared/api';
 import type { ErrorType, PatientNoteDto } from '@/shared/api';
 
+/** Backend limit for `CreatePatientNoteDto.body`. */
+export const MAX_NOTE_LENGTH = 5000;
+
 export const patientNotesQueryKey = (patientId: string) =>
   ['patient-notes', patientId] as const;
 
