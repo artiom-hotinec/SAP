@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import type { PatientDto } from '@/shared/api';
 import { formatDateUtc } from '@/shared/lib';
 import { UiReadonlyField } from '@/shared/ui/ui-readonly-field';
@@ -10,11 +10,14 @@ const SEX_LABELS = { FEMALE: 'Female', MALE: 'Male', OTHER: 'Other' } as const;
 
 export interface PatientProfileProps extends HTMLAttributes<HTMLElement> {
   patient: PatientDto;
+  /** Controls shown under the avatar (e.g. the photo upload feature). */
+  avatarActions?: ReactNode;
 }
 
 /** Profile card: photo (initials fallback) and the read-only personal info and address. */
 export function PatientProfile({
   patient,
+  avatarActions,
   className,
   ...props
 }: PatientProfileProps) {
@@ -29,7 +32,10 @@ export function PatientProfile({
       )}
       {...props}
     >
-      <PatientAvatar key={patient.id} patient={patient} />
+      <div className="flex flex-col items-center gap-2">
+        <PatientAvatar key={patient.id} patient={patient} />
+        {avatarActions}
+      </div>
       <div className="grid grid-cols-[repeat(2,220px)] gap-x-20.75 gap-y-6.5">
         <UiReadonlyField label="First Name" value={patient.firstName || '--'} />
         <UiReadonlyField label="Last Name" value={patient.lastName || '--'} />

@@ -81,9 +81,9 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient`: photo upload and delete mutations (multipart `PUT`, `DELETE`) and the photo URL helper with a cache-busting key.
-- [ ] `features/patient/photo`: upload/replace/remove control on the avatar with client checks for type (JPG/PNG/TIFF) and size (5 MB) and server error display (`invalid-photo`, 413).
-- [ ] Show the photo in the list rows and the patient header (initials fallback), invalidating the queries after a change; update `CLAUDE.md`.
+- [x] `entities/patient`: photo upload and delete mutations (multipart `PUT`, `DELETE`) and the photo URL helper with a cache-busting key.
+- [x] `features/patient/photo`: upload/replace/remove control on the avatar with client checks for type (JPG/PNG/TIFF) and size (5 MB) and server error display (`invalid-photo`, 413).
+- [x] Show the photo in the list rows and the patient header (initials fallback), invalidating the queries after a change; update `CLAUDE.md`.
 
 **Definition of Done:** Uploading, replacing and removing a photo updates the avatar on the patient page and in the list.
 **Tests:** Manual browser check with valid and invalid files (wrong type, over 5 MB); `npm run lint` and `npm run build` pass.
