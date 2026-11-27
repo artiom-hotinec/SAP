@@ -1,4 +1,9 @@
-export { useCreatePatientMutation } from './api/patient-mutations';
+export {
+  useCreatePatientMutation,
+  useDeletePatientMutation,
+  useUpdatePatientMutation,
+} from './api/patient-mutations';
+export type { UpdatePatientVariables } from './api/patient-mutations';
 export { usePatientQuery } from './api/patient-query';
 export { patientsQueryKey, usePatientsQuery } from './api/patients-query';
 export { PATIENT_ROW_GRID } from './config/row-grid';

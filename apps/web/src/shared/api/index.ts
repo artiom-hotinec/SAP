@@ -13,8 +13,10 @@ export {
   facilitiesControllerDeleteFacility,
   facilitiesControllerUpdateFacility,
   patientControllerCreatePatient,
+  patientControllerDeletePatient,
   patientControllerGetAllPatients,
   patientControllerGetPatient,
+  patientControllerUpdatePatient,
   PatientFilterBy,
   PatientSortBy,
   Sex,
@@ -43,6 +45,7 @@ export type {
   StatisticsDto,
   UpdateDeviceItemDto,
   UpdateFacilityItemDto,
+  UpdatePatientDto,
   UserDto,
   UserDtoRole,
 } from './generated';
