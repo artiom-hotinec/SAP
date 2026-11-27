@@ -81,7 +81,7 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient`: photo upload and delete mutations (multipart `PUT`, `DELETE`) and the photo URL helper with a cache-busting key.
+- [x] `entities/patient`: photo upload and delete mutations (multipart `PUT`, `DELETE`) and the photo URL helper with a cache-busting key.
 - [ ] `features/patient/photo`: upload/replace/remove control on the avatar with client checks for type (JPG/PNG/TIFF) and size (5 MB) and server error display (`invalid-photo`, 413).
 - [ ] Show the photo in the list rows and the patient header (initials fallback), invalidating the queries after a change; update `CLAUDE.md`.
 

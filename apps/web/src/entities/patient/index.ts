@@ -4,6 +4,14 @@ export {
   useUpdatePatientMutation,
 } from './api/patient-mutations';
 export type { UpdatePatientVariables } from './api/patient-mutations';
+export {
+  getPatientPhotoUrl,
+  patientPhotoVersionQueryKey,
+  useDeletePatientPhotoMutation,
+  usePatientPhotoVersion,
+  useUploadPatientPhotoMutation,
+} from './api/patient-photo';
+export type { UploadPatientPhotoVariables } from './api/patient-photo';
 export { usePatientQuery } from './api/patient-query';
 export { patientsQueryKey, usePatientsQuery } from './api/patients-query';
 export { PATIENT_ROW_GRID } from './config/row-grid';
