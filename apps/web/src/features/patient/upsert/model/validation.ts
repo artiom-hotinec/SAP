@@ -1,3 +1,5 @@
+import { hasDevice } from './form-values';
+
 const DOB_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Optional date of birth as `YYYY-MM-DD`: a real calendar date, not in the future. */
@@ -76,7 +78,7 @@ export function validateNumberInRange(
 
 /** Prescribed pressure (cmH2O, 4-20): required once a device is chosen. */
 export function validatePressureWhen(deviceId: string, value: string) {
-  if (deviceId === '') return true;
+  if (!hasDevice(deviceId)) return true;
   if (value.trim() === '') return 'Pressure is required';
 
   return validateNumberInRange(value, { min: 4, max: 20 });

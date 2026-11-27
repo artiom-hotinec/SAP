@@ -5,10 +5,11 @@ import type { FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { PATIENT_FORM_STEPS, STEP_FIELDS } from '../config/steps';
 import type { PatientFormStep } from '../config/steps';
-import { EMPTY_PATIENT_VALUES } from './form-values';
+import type { PatientDto } from '@/shared/api';
+import { EMPTY_PATIENT_VALUES, toFormValues } from './form-values';
 import type { PatientFormValues } from './form-values';
 import { mapPatientError } from './map-patient-error';
-import { useCreatePatient } from './use-create-patient';
+import { useSavePatient } from './use-save-patient';
 
 export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 
@@ -16,16 +17,26 @@ export const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
  * State of the 5-step patient form. Next validates only the current step's
  * fields; Back keeps everything typed, because one form instance holds all steps.
  */
-export function usePatientForm({ onDone }: { onDone: () => void }) {
+export function usePatientForm({
+  patient,
+  onDone,
+}: {
+  /** Edit this patient; omitted = create. */
+  patient?: PatientDto;
+  onDone: () => void;
+}) {
   // `onChange`: an error set by `trigger()` on Next clears once the field is valid.
   const form = useForm<PatientFormValues>({
     mode: 'onChange',
-    defaultValues: EMPTY_PATIENT_VALUES,
+    defaultValues: patient ? toFormValues(patient) : EMPTY_PATIENT_VALUES,
     // Keep values of fields whose step is unmounted (Back/Next).
     shouldUnregister: false,
   });
   const [step, setStep] = useState<PatientFormStep>(1);
-  const { submit, isPending, error } = useCreatePatient({ onSuccess: onDone });
+  const { submit, isPending, error } = useSavePatient({
+    patient,
+    onSuccess: onDone,
+  });
 
   const isLastStep = step === PATIENT_FORM_STEPS;
   const canGoBack = step > 1;

@@ -2,6 +2,7 @@ import { Controller, useWatch } from 'react-hook-form';
 import { useDevicesQuery } from '@/entities/device';
 import { UiDropdown } from '@/shared/ui/ui-dropdown';
 import { UiInput } from '@/shared/ui/ui-input';
+import { KEEP_DEVICE, hasDevice } from '../../model/form-values';
 import { validatePressureWhen } from '../../model/validation';
 import type { PatientStepProps } from './types';
 
@@ -17,8 +18,11 @@ export function DeviceStep({ form }: PatientStepProps) {
   const deviceId = useWatch({ control, name: 'deviceId' });
   const { data: devices = [] } = useDevicesQuery();
 
+  const isEdit = form.formState.defaultValues?.deviceId === KEEP_DEVICE;
+
   const options = [
-    { value: '', label: 'No device' },
+    ...(isEdit ? [{ value: KEEP_DEVICE, label: 'Keep current device' }] : []),
+    { value: '', label: isEdit ? 'No device (unassign)' : 'No device' },
     ...devices
       .filter((device) => !device.assigned)
       .map((device) => ({
@@ -34,7 +38,7 @@ export function DeviceStep({ form }: PatientStepProps) {
         name="deviceId"
         render={({ field }) => (
           <UiDropdown
-            label="Device (Optional)"
+            label={isEdit ? 'Device' : 'Device (Optional)'}
             options={options}
             value={field.value}
             error={errors.deviceId?.message}
@@ -46,7 +50,7 @@ export function DeviceStep({ form }: PatientStepProps) {
           />
         )}
       />
-      {deviceId !== '' && (
+      {hasDevice(deviceId) && (
         <UiInput
           label="Prescribed pressure, cmH2O"
           inputMode="decimal"
