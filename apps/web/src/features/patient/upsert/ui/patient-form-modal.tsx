@@ -1,6 +1,7 @@
 'use client';
 
 import { useId } from 'react';
+import type { PatientDto } from '@/shared/api';
 import { UiButton } from '@/shared/ui/ui-button';
 import { UiFormModal } from '@/shared/ui/ui-form-modal';
 import { UiStepper } from '@/shared/ui/ui-stepper';
@@ -15,13 +16,19 @@ import { SleepStudyStep } from './steps/sleep-study-step';
 export interface PatientFormModalProps {
   open: boolean;
   onClose: () => void;
+  /** Edit this patient; omitted = create a new one. */
+  patient?: PatientDto;
 }
 
 /**
  * Mount it only while it is open: the form state lives here, so each mount
- * starts from an empty form.
+ * starts from an empty form (or the patient's values).
  */
-export function PatientFormModal({ open, onClose }: PatientFormModalProps) {
+export function PatientFormModal({
+  open,
+  onClose,
+  patient,
+}: PatientFormModalProps) {
   const formId = useId();
   const {
     form,
@@ -32,12 +39,12 @@ export function PatientFormModal({ open, onClose }: PatientFormModalProps) {
     onSubmit,
     isPending,
     serverError,
-  } = usePatientForm({ onDone: onClose });
+  } = usePatientForm({ patient, onDone: onClose });
 
   return (
     <UiFormModal
       open={open}
-      title="New Patient"
+      title={patient ? 'Edit Patient' : 'New Patient'}
       onClose={onClose}
       stepper={
         <UiStepper

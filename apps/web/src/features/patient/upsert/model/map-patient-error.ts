@@ -8,7 +8,7 @@ export interface PatientFieldError {
   message: string;
 }
 
-/** `type`s `POST /patients` answers with, and the field each belongs to. */
+/** `type`s `POST /patients` and `PATCH /patients/:id` answer with, and the field each belongs to. */
 const ERRORS: Record<string, Record<number, PatientFieldError>> = {
   'email-exists': {
     409: {

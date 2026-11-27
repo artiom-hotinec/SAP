@@ -67,8 +67,8 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `useUpdatePatientMutation` (variables `{ id, data }`) and `useDeletePatientMutation` in `entities/patient`.
-- [ ] `EditPatientButton`: reuse `PatientFormModal` prefilled from the patient (partial `PATCH`, device omitted/`null`/new handled), starting at step 1, with the same error mapping; invalidate the patient and list queries.
+- [x] `useUpdatePatientMutation` (variables `{ id, data }`) and `useDeletePatientMutation` in `entities/patient`.
+- [x] `EditPatientButton`: reuse `PatientFormModal` prefilled from the patient (partial `PATCH`, device omitted/`null`/new handled), starting at step 1, with the same error mapping; invalidate the patient and list queries.
 - [ ] `features/patient/delete`: confirmation `UiModal`, delete, invalidate the list and statistics, and return to `/patients`.
 - [ ] Wire both into the patient page header and update `CLAUDE.md`.
 
