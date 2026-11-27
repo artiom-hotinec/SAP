@@ -14,6 +14,7 @@ import { ROUTES } from '@/shared/config';
 import { UiLink } from '@/shared/ui/ui-link';
 import { UiPageTitle } from '@/shared/ui/ui-page-title';
 
+import { PatientDocumentsSection } from './patient-documents-section';
 import { PatientMessagesSection } from './patient-messages-section';
 
 export interface PatientDetailsPageProps {
@@ -61,6 +62,7 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
             />
             <PatientClinicalInfo patient={data} />
             <PatientDevice />
+            <PatientDocumentsSection patientId={data.id} />
             <PatientMessagesSection patientId={data.id} />
           </div>
         </>

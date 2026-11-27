@@ -109,7 +109,7 @@
 
 - [x] `entities/patient-document`: list query, upload and delete mutations, and the download link (`GET .../file`).
 - [x] `features/patient/upload-document` (PDF/PNG/JPEG, max 20 MB, client checks and error display) and `features/patient/delete-document` (with confirmation).
-- [ ] Documents section on the patient page from Figma (list, empty/loading/error states) and `CLAUDE.md` update.
+- [x] Documents section on the patient page from Figma (list, empty/loading/error states) and `CLAUDE.md` update.
 
 **Definition of Done:** Documents are listed, uploaded, opened/downloaded and deleted, each reflected without a reload.
 **Tests:** Manual browser check with a valid PDF, a wrong type and an over-size file, then download and delete; `npm run lint` and `npm run build` pass.
