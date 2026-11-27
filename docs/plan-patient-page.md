@@ -107,7 +107,7 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient-document`: list query, upload and delete mutations, and the download link (`GET .../file`).
+- [x] `entities/patient-document`: list query, upload and delete mutations, and the download link (`GET .../file`).
 - [ ] `features/patient/upload-document` (PDF/PNG/JPEG, max 20 MB, client checks and error display) and `features/patient/delete-document` (with confirmation).
 - [ ] Documents section on the patient page from Figma (list, empty/loading/error states) and `CLAUDE.md` update.
 
