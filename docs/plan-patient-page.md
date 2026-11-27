@@ -69,8 +69,8 @@
 
 - [x] `useUpdatePatientMutation` (variables `{ id, data }`) and `useDeletePatientMutation` in `entities/patient`.
 - [x] `EditPatientButton`: reuse `PatientFormModal` prefilled from the patient (partial `PATCH`, device omitted/`null`/new handled), starting at step 1, with the same error mapping; invalidate the patient and list queries.
-- [ ] `features/patient/delete`: confirmation `UiModal`, delete, invalidate the list and statistics, and return to `/patients`.
-- [ ] Wire both into the patient page header and update `CLAUDE.md`.
+- [x] `features/patient/delete`: confirmation `UiModal`, delete, invalidate the list and statistics, and return to `/patients`.
+- [x] Wire both into the patient page header and update `CLAUDE.md`.
 
 **Definition of Done:** Editing saves and updates both the patient page and the list; deleting asks for confirmation and removes the patient from the list; edit validation errors and server errors behave as in create.
 **Tests:** Manual browser check of editing each step (including device swap and unassign) and deleting; `npm run lint` and `npm run build` pass.

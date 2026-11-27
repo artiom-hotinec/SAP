@@ -7,6 +7,8 @@ import {
   PatientProfile,
   usePatientQuery,
 } from '@/entities/patient';
+import { DeletePatientButton } from '@/features/patient/delete';
+import { EditPatientButton } from '@/features/patient/upsert';
 import { ROUTES } from '@/shared/config';
 import { UiLink } from '@/shared/ui/ui-link';
 import { UiPageTitle } from '@/shared/ui/ui-page-title';
@@ -38,9 +40,15 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
         <PatientDetailsSkeleton />
       ) : (
         <>
-          <UiPageTitle className="mb-6 text-grey-800">
-            {data.firstName} {data.lastName}
-          </UiPageTitle>
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <UiPageTitle className="text-grey-800">
+              {data.firstName} {data.lastName}
+            </UiPageTitle>
+            <div className="flex items-center gap-2">
+              <EditPatientButton patient={data} />
+              <DeletePatientButton patient={data} />
+            </div>
+          </div>
           <div className="flex flex-col gap-6">
             <PatientProfile patient={data} />
             <PatientClinicalInfo patient={data} />
