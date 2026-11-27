@@ -96,7 +96,7 @@
 
 - [x] `entities/patient-message`: query and `useSendMessageMutation` (body up to 2000 chars).
 - [x] `features/patient/send-message`: composer with validation (non-empty, length) and error display.
-- [ ] Messages section on the patient page from Figma (thread, empty/loading/error states) and `CLAUDE.md` update.
+- [x] Messages section on the patient page from Figma (thread, empty/loading/error states) and `CLAUDE.md` update.
 
 **Definition of Done:** The thread loads for the patient; a sent message appears without a reload.
 **Tests:** Manual browser check of sending, empty and over-length input, and the empty thread; `npm run lint` and `npm run build` pass.

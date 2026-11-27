@@ -22,6 +22,7 @@ export {
   patientMessageControllerGetMessages,
   patientMessageControllerSendMessage,
   PatientFilterBy,
+  PatientMessageDtoDirection,
   PatientSortBy,
   Sex,
   providersControllerGetProvider,
