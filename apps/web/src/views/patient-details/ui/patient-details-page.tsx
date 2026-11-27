@@ -8,6 +8,7 @@ import {
   usePatientQuery,
 } from '@/entities/patient';
 import { DeletePatientButton } from '@/features/patient/delete';
+import { PatientPhotoControl } from '@/features/patient/photo';
 import { EditPatientButton } from '@/features/patient/upsert';
 import { ROUTES } from '@/shared/config';
 import { UiLink } from '@/shared/ui/ui-link';
@@ -50,7 +51,12 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
             </div>
           </div>
           <div className="flex flex-col gap-6">
-            <PatientProfile patient={data} />
+            <PatientProfile
+              patient={data}
+              avatarActions={
+                <PatientPhotoControl key={data.id} patientId={data.id} />
+              }
+            />
             <PatientClinicalInfo patient={data} />
             <PatientDevice />
           </div>
