@@ -16,6 +16,7 @@ import { UiPageTitle } from '@/shared/ui/ui-page-title';
 
 import { PatientDocumentsSection } from './patient-documents-section';
 import { PatientMessagesSection } from './patient-messages-section';
+import { PatientNotesSection } from './patient-notes-section';
 
 export interface PatientDetailsPageProps {
   id: string;
@@ -64,6 +65,7 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
             <PatientDevice />
             <PatientDocumentsSection patientId={data.id} />
             <PatientMessagesSection patientId={data.id} />
+            <PatientNotesSection patientId={data.id} />
           </div>
         </>
       )}
