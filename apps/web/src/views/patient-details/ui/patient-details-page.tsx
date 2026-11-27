@@ -1,7 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { usePatientQuery } from '@/entities/patient';
+import {
+  PatientClinicalInfo,
+  PatientDevice,
+  PatientProfile,
+  usePatientQuery,
+} from '@/entities/patient';
 import { ROUTES } from '@/shared/config';
 import { UiLink } from '@/shared/ui/ui-link';
 import { UiPageTitle } from '@/shared/ui/ui-page-title';
@@ -30,16 +35,32 @@ export function PatientDetailsPage({ id }: PatientDetailsPageProps) {
             : 'Failed to load patient.'}
         </p>
       ) : isPending ? (
-        <div
-          aria-busy="true"
-          aria-label="Loading patient"
-          className="h-12 w-72 animate-pulse rounded-lg bg-grey-200"
-        />
+        <PatientDetailsSkeleton />
       ) : (
-        <UiPageTitle className="text-grey-800">
-          {data.firstName} {data.lastName}
-        </UiPageTitle>
+        <>
+          <UiPageTitle className="mb-6 text-grey-800">
+            {data.firstName} {data.lastName}
+          </UiPageTitle>
+          <div className="flex flex-col gap-6">
+            <PatientProfile patient={data} />
+            <PatientClinicalInfo patient={data} />
+            <PatientDevice />
+          </div>
+        </>
       )}
+    </div>
+  );
+}
+
+function PatientDetailsSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading patient">
+      <div className="mb-6 h-12 w-72 animate-pulse rounded-lg bg-grey-200" />
+      <div className="flex flex-col gap-6">
+        <div className="h-100 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+        <div className="h-40 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+        <div className="h-32 animate-pulse rounded-lg border border-grey-500 bg-grey-200" />
+      </div>
     </div>
   );
 }

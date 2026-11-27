@@ -20,6 +20,10 @@ export {
   validateWeight,
   validateZip,
 } from './lib/validation';
+export { PatientAvatar } from './ui/patient-avatar';
+export { PatientClinicalInfo } from './ui/patient-clinical-info';
+export { PatientDevice } from './ui/patient-device';
+export { PatientProfile } from './ui/patient-profile';
 export { PatientHeightField } from './ui/patient-height-field';
 export type { PatientHeightFieldProps } from './ui/patient-height-field';
 export { PatientRow } from './ui/patient-row';
