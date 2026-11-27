@@ -3,9 +3,8 @@ import Link from 'next/link';
 import type { ComponentProps } from 'react';
 import type { PatientDto } from '@/shared/api';
 import { patientDetailsRoute } from '@/shared/config';
-import { getInitials } from '@/shared/lib';
-import { UiAvatar } from '@/shared/ui/ui-avatar';
 import { PATIENT_ROW_GRID } from '../config/row-grid';
+import { PatientAvatar } from './patient-avatar';
 
 export interface PatientRowProps extends Omit<
   ComponentProps<typeof Link>,
@@ -27,7 +26,7 @@ export function PatientRow({ patient, className, ...props }: PatientRowProps) {
       {...props}
     >
       <span className="flex min-w-0 items-center gap-4 pr-4">
-        <UiAvatar initials={getInitials(patient, patient.email)} />
+        <PatientAvatar patient={patient} size="sm" />
         <span className="truncate">
           {patient.firstName} {patient.lastName}
         </span>
