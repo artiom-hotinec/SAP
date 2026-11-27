@@ -120,8 +120,8 @@
 **Impacts:** Frontend
 **Tasks:**
 
-- [ ] `entities/patient-note`: list query and `useAddNoteMutation`.
-- [ ] `features/patient/add-note` and the Notes section on the patient page from Figma (list, empty/loading/error states).
+- [x] `entities/patient-note`: list query and `useAddNoteMutation`.
+- [x] `features/patient/add-note` and the Notes section on the patient page from Figma (list, empty/loading/error states).
 - [ ] Side-by-side check of every listed Figma node in the browser and fix the differences; review the FSD layer imports and public APIs (`index.ts`) of all new slices.
 - [ ] Final docs pass (`apps/web/CLAUDE.md`, root `CLAUDE.md` routes, `DRAFT.md` if relevant) and a full manual run of every PRD flow, checking the console for errors.
 
